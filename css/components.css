@@ -1,0 +1,409 @@
+/* ==================== Header ==================== */
+.page-title {
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
+}
+
+.page-eyebrow {
+  display: block;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: var(--sp-1);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+}
+.icon-btn:active {
+  transform: scale(0.92);
+  background: var(--surface-alt);
+}
+
+/* ==================== Tab bar (bas d'écran, style iOS) ==================== */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--app-max-width);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  padding: var(--sp-2) var(--sp-2) calc(var(--safe-bottom) + var(--sp-2));
+  background: rgba(23, 26, 33, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-soft);
+  z-index: 30;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--sp-1) 0;
+  color: var(--text-tertiary);
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.tab-item.is-active {
+  color: var(--text-primary);
+}
+
+.tab-label {
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+}
+
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Bouton central "Séance" mis en avant */
+.tab-item--cta {
+  position: relative;
+  top: -14px;
+}
+.tab-icon--cta {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-forge);
+  box-shadow: var(--shadow-accent-glow);
+  -webkit-mask: none;
+  mask: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+}
+.tab-item--cta .tab-icon--cta::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  background-color: #12141A;
+  -webkit-mask: var(--icon-session) center / contain no-repeat;
+  mask: var(--icon-session) center / contain no-repeat;
+}
+.tab-item--cta.is-active .tab-icon--cta { transform: scale(1.04); }
+.tab-item--cta .tab-label { color: var(--text-primary); font-weight: var(--fw-semibold); }
+
+/* ==================== Cartes ==================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+}
+
+.card + .card {
+  margin-top: var(--sp-4);
+}
+
+.card-title {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.01em;
+}
+
+.card-sub {
+  color: var(--text-secondary);
+  font-size: var(--fs-small);
+  margin-top: 2px;
+}
+
+.section {
+  margin-top: var(--sp-8);
+}
+.section:first-child { margin-top: var(--sp-3); }
+
+.section-title {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--sp-3);
+}
+
+/* ==================== Boutons ==================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px 22px;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  transition: transform var(--dur-fast) var(--ease-standard), opacity var(--dur-fast) var(--ease-standard);
+  width: 100%;
+}
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  background: var(--gradient-forge);
+  color: #14110E;
+  box-shadow: var(--shadow-accent-glow);
+}
+
+.btn-secondary {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+  padding: 10px 12px;
+  width: auto;
+}
+
+.btn-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.btn-block-row {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+/* ==================== Anneaux de progression (signature visuelle) ==================== */
+.ring-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: var(--surface-alt); }
+.ring-value { fill: none; stroke: url(#ringGradient); stroke-linecap: round; transition: stroke-dashoffset var(--dur-slow) var(--ease-spring); }
+.ring-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ring-center strong { font-size: var(--fs-h2); font-weight: var(--fw-bold); }
+.ring-center span { font-size: var(--fs-caption); color: var(--text-secondary); }
+
+/* ==================== États vides ==================== */
+.empty-state {
+  text-align: center;
+  padding: var(--sp-10) var(--sp-4);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+}
+.empty-state .empty-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto var(--sp-4);
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-state h3 {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--sp-1);
+}
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: var(--fs-small);
+  max-width: 30ch;
+  margin: 0 auto var(--sp-5);
+}
+
+/* ==================== Badges / pastilles ==================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+.badge-accent { background: var(--accent-soft); color: var(--accent-strong); }
+.badge-steel { background: var(--accent-2-soft); color: var(--accent-2); }
+.badge-success { background: var(--success-soft); color: var(--success); }
+
+/* ==================== Stat tiles ==================== */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+}
+.stat-tile .stat-value {
+  font-size: var(--fs-display);
+  font-weight: var(--fw-black);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  background: var(--gradient-forge);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: block;
+  line-height: 1.1;
+}
+.stat-tile .stat-label {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  margin-top: var(--sp-1);
+}
+
+/* ==================== Listes (exercices, historique...) ==================== */
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.list-row:last-child { border-bottom: none; }
+.list-row-title { font-weight: var(--fw-semibold); }
+.list-row-sub { color: var(--text-secondary); font-size: var(--fs-small); margin-top: 2px; }
+.list-row-chevron { color: var(--text-tertiary); }
+
+/* ==================== Formulaires ==================== */
+.field {
+  margin-bottom: var(--sp-4);
+}
+.field label {
+  display: block;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-2);
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: var(--fs-body);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+}
+
+/* Segmented control (ex: kg/lb) */
+.segmented {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+.segmented button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  border-radius: 7px;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  transition: all var(--dur-fast) var(--ease-standard);
+}
+.segmented button.is-active {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+}
+
+/* ==================== Cartes d'objectif (onboarding) ==================== */
+.objective-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+.objective-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  text-align: left;
+  transition: border-color var(--dur-fast), transform var(--dur-fast);
+}
+.objective-card:active { transform: scale(0.97); }
+.objective-card.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.objective-card .obj-emoji { font-size: 22px; display: block; margin-bottom: var(--sp-2); }
+.objective-card .obj-name { font-weight: var(--fw-semibold); font-size: var(--fs-small); }
+
+/* ==================== Toasts ==================== */
+.toast-root {
+  position: fixed;
+  bottom: calc(var(--tabbar-height) + var(--safe-bottom) + var(--sp-3));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: calc(100% - var(--sp-8));
+  max-width: calc(var(--app-max-width) - var(--sp-8));
+  pointer-events: none;
+}
+.toast {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  box-shadow: var(--shadow-elevated);
+  animation: toast-in var(--dur-base) var(--ease-spring);
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

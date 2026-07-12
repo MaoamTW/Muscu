@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<title>Forge — Suivi Musculation</title>
+<meta name="description" content="Application personnelle de suivi de musculation, 100% locale et hors ligne." />
+
+<!-- PWA / iOS -->
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#12141A" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Forge" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" href="icons/icon-192.png" />
+
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/base.css" />
+<link rel="stylesheet" href="css/icons.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+
+  <div id="app" class="app-shell">
+    <header id="app-header" class="app-header"></header>
+    <main id="view" class="view" role="main"></main>
+  </div>
+
+  <nav id="tabbar" class="tabbar" aria-label="Navigation principale">
+    <a href="#/home" class="tab-item" data-route="home">
+      <span class="tab-icon" data-icon="home"></span>
+      <span class="tab-label">Accueil</span>
+    </a>
+    <a href="#/program" class="tab-item" data-route="program">
+      <span class="tab-icon" data-icon="program"></span>
+      <span class="tab-label">Programme</span>
+    </a>
+    <a href="#/session" class="tab-item tab-item--cta" data-route="session">
+      <span class="tab-icon tab-icon--cta" data-icon="session"></span>
+      <span class="tab-label">Séance</span>
+    </a>
+    <a href="#/stats" class="tab-item" data-route="stats">
+      <span class="tab-icon" data-icon="stats"></span>
+      <span class="tab-label">Stats</span>
+    </a>
+    <a href="#/profile" class="tab-item" data-route="profile">
+      <span class="tab-icon" data-icon="profile"></span>
+      <span class="tab-label">Profil</span>
+    </a>
+  </nav>
+
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

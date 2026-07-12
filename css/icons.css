@@ -1,0 +1,48 @@
+/*
+  Icônes en mask CSS (SVG inline en data-URI), pour rester 100% autonome
+  (aucune dépendance à une icon-font ou un CDN externe).
+*/
+:root {
+  --icon-home: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11.5 12 4l9 7.5'/%3E%3Cpath d='M5.5 9.5V20h13V9.5'/%3E%3Cpath d='M9.5 20v-6h5v6'/%3E%3C/svg%3E");
+  --icon-program: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='3'/%3E%3Cpath d='M8 9h8M8 13h8M8 17h5'/%3E%3C/svg%3E");
+  --icon-session: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h2M18 12h2M6 9v6M18 9v6M8 12h8'/%3E%3C/svg%3E");
+  --icon-stats: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 20V10M12 20V4M19 20v-7'/%3E%3C/svg%3E");
+  --icon-profile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='3.5'/%3E%3Cpath d='M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5'/%3E%3C/svg%3E");
+  --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E");
+  --icon-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  --icon-trophy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 4h10v4a5 5 0 0 1-10 0V4Z'/%3E%3Cpath d='M7 5H4a3 3 0 0 0 3 4M17 5h3a3 3 0 0 1-3 4'/%3E%3Cpath d='M12 13v3m-3 4h6m-3-4v0'/%3E%3C/svg%3E");
+  --icon-history: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 3-6.7'/%3E%3Cpath d='M3 4v4h4M12 7v5l3 3'/%3E%3C/svg%3E");
+  --icon-dumbbell: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9v6M2 10v4M20 9v6M22 10v4M7 12h10'/%3E%3Cpath d='M6 8v8M18 8v8'/%3E%3C/svg%3E");
+  --icon-export: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V4m0 0 4 4m-4-4L8 8'/%3E%3Cpath d='M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E");
+  --icon-import: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11m0 0 4-4m-4 4-4-4'/%3E%3Cpath d='M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3'/%3E%3C/svg%3E");
+  --icon-target: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Ccircle cx='12' cy='12' r='0.5'/%3E%3C/svg%3E");
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+}
+
+.tab-icon[data-icon="home"] { -webkit-mask-image: var(--icon-home); mask-image: var(--icon-home); }
+.tab-icon[data-icon="program"] { -webkit-mask-image: var(--icon-program); mask-image: var(--icon-program); }
+.tab-icon[data-icon="stats"] { -webkit-mask-image: var(--icon-stats); mask-image: var(--icon-stats); }
+.tab-icon[data-icon="profile"] { -webkit-mask-image: var(--icon-profile); mask-image: var(--icon-profile); }
+
+.icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  vertical-align: middle;
+}
+.icon-chevron { -webkit-mask-image: var(--icon-chevron); mask-image: var(--icon-chevron); }
+.icon-plus { -webkit-mask-image: var(--icon-plus); mask-image: var(--icon-plus); }
+.icon-trophy { -webkit-mask-image: var(--icon-trophy); mask-image: var(--icon-trophy); }
+.icon-history { -webkit-mask-image: var(--icon-history); mask-image: var(--icon-history); }
+.icon-dumbbell { -webkit-mask-image: var(--icon-dumbbell); mask-image: var(--icon-dumbbell); }
+.icon-export { -webkit-mask-image: var(--icon-export); mask-image: var(--icon-export); }
+.icon-import { -webkit-mask-image: var(--icon-import); mask-image: var(--icon-import); }
+.icon-target { -webkit-mask-image: var(--icon-target); mask-image: var(--icon-target); }
+.icon-check { -webkit-mask-image: var(--icon-check); mask-image: var(--icon-check); }

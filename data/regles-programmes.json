@@ -1,0 +1,4 @@
+{
+  "_comment": "Les règles de génération de programme (objectif -> structure de séances) sont désormais définies dans js/data/programTemplates.js (format JS, plus simple à maintenir avec des commentaires). Ce fichier JSON est conservé pour mémoire mais n'est plus utilisé par l'application.",
+  "rules": []
+}

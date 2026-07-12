@@ -1,0 +1,178 @@
+/* ==================== Onboarding ==================== */
+.onboarding-intro {
+  text-align: center;
+  padding: var(--sp-6) 0 var(--sp-8);
+}
+.onboarding-intro .brand-mark {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--sp-4);
+  border-radius: var(--radius-md);
+  background: var(--gradient-forge);
+  box-shadow: var(--shadow-accent-glow);
+}
+.onboarding-intro h1 {
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
+}
+.onboarding-intro p {
+  color: var(--text-secondary);
+  font-size: var(--fs-small);
+  margin-top: var(--sp-2);
+}
+.objective-group-title {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin: var(--sp-6) 0 var(--sp-3);
+}
+.onboarding-footer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--app-max-width);
+  padding: var(--sp-4) var(--sp-5) calc(var(--safe-bottom) + var(--sp-4));
+  background: linear-gradient(to top, var(--bg) 55%, transparent);
+}
+
+/* ==================== Dashboard ==================== */
+.hero-ring-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+.hero-ring-card .hero-info { flex: 1; }
+.hero-ring-card .hero-info h2 {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+}
+.hero-ring-card .hero-info p {
+  color: var(--text-secondary);
+  font-size: var(--fs-small);
+  margin-top: 4px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+/* ==================== Séance en cours ==================== */
+.session-timer {
+  text-align: center;
+  padding: var(--sp-6) 0;
+}
+.session-timer .timer-value {
+  font-size: 3rem;
+  font-weight: var(--fw-black);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.session-timer .timer-label {
+  color: var(--text-secondary);
+  font-size: var(--fs-small);
+  margin-top: var(--sp-1);
+}
+
+.exercise-block {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-3);
+}
+.exercise-block .exercise-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.set-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 1fr 32px;
+  gap: var(--sp-2);
+  align-items: center;
+  margin-top: var(--sp-3);
+}
+.set-row .set-index {
+  color: var(--text-tertiary);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+}
+.set-row input {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==================== Historique / listes ==================== */
+.filter-row {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding-bottom: var(--sp-1);
+  margin-bottom: var(--sp-2);
+}
+.filter-chip {
+  flex: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+}
+.filter-chip.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  border-color: transparent;
+}
+
+/* ==================== Records ==================== */
+.record-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.record-row:last-child { border-bottom: none; }
+.record-medal {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.record-info { flex: 1; }
+.record-value {
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==================== Profil ==================== */
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-steel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: var(--fw-bold);
+  color: #0E1420;
+  margin: 0 auto var(--sp-3);
+}

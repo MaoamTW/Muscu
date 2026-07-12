@@ -1,0 +1,102 @@
+/*
+  FORGE — Design tokens
+  Direction : "Hybride" validée dans le cahier des charges.
+  Base sombre premium (graphite chaud) + accent cuivre/braise (identité "forge",
+  matière chauffée/travaillée) + bleu acier en accent secondaire pour la donnée
+  (stats, records). Police système (SF Pro sur iPhone) pour une sensation native,
+  travaillée via graisse/espacement plutôt que par une police téléchargée
+  (garantit aussi le rendu 100% hors-ligne dès la première ouverture).
+*/
+
+:root {
+  /* Surfaces */
+  --bg: #12141A;
+  --bg-elevated: #171A21;
+  --surface: #1B1E26;
+  --surface-alt: #23262F;
+  --surface-hover: #2A2E38;
+  --border: #2E323C;
+  --border-soft: #23262F;
+
+  /* Texte */
+  --text-primary: #F5F3EF;
+  --text-secondary: #9CA0AC;
+  --text-tertiary: #676C78;
+
+  /* Accents */
+  --accent: #FF6B4A;          /* cuivre / braise — actions principales, CTA */
+  --accent-strong: #FF8563;
+  --accent-soft: rgba(255, 107, 74, 0.14);
+  --accent-2: #5B8DEF;        /* acier — données, records, secondaire */
+  --accent-2-soft: rgba(91, 141, 239, 0.14);
+  --success: #4ADE80;
+  --success-soft: rgba(74, 222, 128, 0.14);
+  --danger: #FF5470;
+  --danger-soft: rgba(255, 84, 112, 0.14);
+
+  /* Dégradé signature (utilisé sur les anneaux de progression) */
+  --gradient-forge: linear-gradient(135deg, var(--accent) 0%, #FF8F3D 100%);
+  --gradient-steel: linear-gradient(135deg, var(--accent-2) 0%, #7FB0FF 100%);
+
+  /* Typographie */
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono-nums: "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --fs-display: 2.5rem;   /* gros chiffres (stats, records) */
+  --fs-h1: 1.75rem;
+  --fs-h2: 1.25rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-caption: 0.75rem;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-black: 800;
+
+  /* Espacement (échelle 4px) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* Rayons */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* Ombres */
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-elevated: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-accent-glow: 0 8px 20px rgba(255, 107, 74, 0.25);
+
+  /* Transitions */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+
+  /* Layout */
+  --app-max-width: 480px;
+  --header-height: 56px;
+  --tabbar-height: 78px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}
