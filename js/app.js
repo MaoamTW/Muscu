@@ -44,6 +44,7 @@ function renderHeader(routeName) {
 
   header.style.display = "";
   tabbar.style.display = "";
+  tabbar.classList.remove("is-hidden"); // toujours visible en arrivant sur une nouvelle page
 
   header.innerHTML = `
     <div class="header-row">
@@ -66,6 +67,41 @@ function updateActiveTab(routeName) {
   document.querySelectorAll(".tab-item").forEach((tab) => {
     tab.classList.toggle("is-active", tab.dataset.route === routeName);
   });
+}
+
+/**
+ * Masque la barre de navigation flottante quand on défile vers le bas (pour
+ * laisser plus de place au contenu), et la réaffiche dès qu'on remonte.
+ * Purement visuel (classe CSS `.is-hidden`, voir css/components.css) — ne
+ * touche à aucune donnée ni logique de navigation.
+ */
+function setupTabbarAutoHide() {
+  const tabbar = document.getElementById("tabbar");
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+  const HIDE_THRESHOLD = 80; // évite de masquer dès les tout premiers pixels de scroll
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const scrollingDown = currentY > lastScrollY;
+
+        if (scrollingDown && currentY > HIDE_THRESHOLD) {
+          tabbar.classList.add("is-hidden");
+        } else {
+          tabbar.classList.remove("is-hidden");
+        }
+
+        lastScrollY = currentY;
+        ticking = false;
+      });
+    },
+    { passive: true }
+  );
 }
 
 async function bootstrap() {
@@ -109,6 +145,7 @@ async function bootstrap() {
 
   // 4. Démarre le routeur
   startRouter();
+  setupTabbarAutoHide();
   await renderCurrentRoute();
 
   // 5. PWA : enregistrement du service worker (fonctionnement hors ligne)

@@ -46,7 +46,7 @@ export async function renderCurrentRoute() {
   if (!handler) return;
   const view = document.getElementById("view");
   await handler(view, param);
-  view.scrollTop = 0;
+  window.scrollTo(0, 0);
 }
 
 /** Change de route par programmation (équivalent à cliquer un lien). */

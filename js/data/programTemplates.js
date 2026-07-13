@@ -20,7 +20,7 @@ export const PROGRAM_TEMPLATES = {
     description: "Alternance Haut du corps / Bas du corps, axée sur les mouvements polyarticulaires et un volume progressif pour soutenir la prise de masse.",
     days: [
       {
-        name: "Jour A — Haut du corps",
+        name: "Haut du corps",
         exercises: [
           { name: "Développé couché", sets: 4, reps: "8-10", restSeconds: 90 },
           { name: "Rowing barre", sets: 4, reps: "8-10", restSeconds: 90 },
@@ -30,7 +30,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour B — Bas du corps",
+        name: "Bas du corps",
         exercises: [
           { name: "Squat", sets: 4, reps: "6-8", restSeconds: 120 },
           { name: "Soulevé de terre", sets: 3, reps: "8-10", restSeconds: 120 },
@@ -48,7 +48,7 @@ export const PROGRAM_TEMPLATES = {
     description: "Programme centré sur les trois mouvements de force (squat, développé couché, soulevé de terre), charges lourdes et faibles répétitions.",
     days: [
       {
-        name: "Jour A — Squat",
+        name: "Squat",
         exercises: [
           { name: "Squat", sets: 5, reps: "5", restSeconds: 180 },
           { name: "Presse à cuisses", sets: 3, reps: "8", restSeconds: 120 },
@@ -56,7 +56,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour B — Développé couché",
+        name: "Développé couché",
         exercises: [
           { name: "Développé couché", sets: 5, reps: "5", restSeconds: 180 },
           { name: "Développé militaire", sets: 3, reps: "6", restSeconds: 120 },
@@ -64,7 +64,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour C — Soulevé de terre",
+        name: "Soulevé de terre",
         exercises: [
           { name: "Soulevé de terre", sets: 5, reps: "3", restSeconds: 180 },
           { name: "Rowing barre", sets: 3, reps: "6", restSeconds: 120 },
@@ -80,14 +80,14 @@ export const PROGRAM_TEMPLATES = {
     description: "Alternance de cardio continu et de cardio fractionné pour développer la capacité cardiovasculaire.",
     days: [
       {
-        name: "Jour A — Cardio continu",
+        name: "Cardio continu",
         exercises: [
           { name: "Course à pied", durationMinutes: 30, note: "Allure modérée, conversation possible" },
           { name: "Vélo elliptique", durationMinutes: 15, note: "Récupération active" },
         ],
       },
       {
-        name: "Jour B — Cardio fractionné",
+        name: "Cardio fractionné",
         exercises: [
           { name: "Rameur", durationMinutes: 20, note: "Intervalles 1 min effort / 1 min récupération" },
           { name: "Course à pied", durationMinutes: 15, note: "Récupération active en fin de séance" },
@@ -120,7 +120,7 @@ export const PROGRAM_TEMPLATES = {
     description: "Musculation en répétitions modérées à hautes avec finisher cardio, pour préserver la masse musculaire en période de déficit calorique.",
     days: [
       {
-        name: "Jour A — Haut du corps + cardio",
+        name: "Haut du corps + cardio",
         exercises: [
           { name: "Développé couché", sets: 4, reps: "10-12", restSeconds: 75 },
           { name: "Tirage horizontal", sets: 4, reps: "10-12", restSeconds: 75 },
@@ -129,7 +129,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour B — Bas du corps + cardio",
+        name: "Bas du corps + cardio",
         exercises: [
           { name: "Squat", sets: 4, reps: "10-12", restSeconds: 75 },
           { name: "Fentes", sets: 3, reps: "12 par jambe", restSeconds: 60 },
@@ -138,7 +138,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour C — Cardio dédié",
+        name: "Cardio dédié",
         exercises: [{ name: "Rameur", durationMinutes: 25, note: "Intervalles modérés" }],
       },
     ],
@@ -211,7 +211,7 @@ export const PROGRAM_TEMPLATES = {
     description: "Travail de mobilité articulaire (hanches, chevilles, épaules, colonne) pour améliorer l'amplitude de mouvement.",
     days: [
       {
-        name: "Jour A — Mobilité hanches & chevilles",
+        name: "Mobilité hanches & chevilles",
         exercises: [
           { name: "Rotations de hanches", sets: 3, reps: "10 répétitions", restSeconds: 30 },
           { name: "Étirement du fessier (pigeon)", sets: 3, holdSeconds: 30, note: "Par côté" },
@@ -219,7 +219,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour B — Mobilité haut du corps",
+        name: "Mobilité haut du corps",
         exercises: [
           { name: "Rotations d'épaules au bâton", sets: 3, reps: "10 répétitions", restSeconds: 30 },
           { name: "Étirement pectoraux (cadre de porte)", sets: 3, holdSeconds: 30 },
@@ -235,7 +235,7 @@ export const PROGRAM_TEMPLATES = {
     description: "Étirements statiques maintenus, pour gagner en amplitude musculaire sur le long terme.",
     days: [
       {
-        name: "Jour A — Étirements bas du corps",
+        name: "Étirements bas du corps",
         exercises: [
           { name: "Étirement ischio-jambiers", sets: 3, holdSeconds: 30, note: "Par jambe" },
           { name: "Étirement quadriceps", sets: 3, holdSeconds: 30, note: "Par jambe" },
@@ -243,7 +243,7 @@ export const PROGRAM_TEMPLATES = {
         ],
       },
       {
-        name: "Jour B — Étirements haut du corps",
+        name: "Étirements haut du corps",
         exercises: [
           { name: "Étirement épaule croisée", sets: 3, holdSeconds: 30, note: "Par bras" },
           { name: "Étirement triceps", sets: 3, holdSeconds: 30, note: "Par bras" },

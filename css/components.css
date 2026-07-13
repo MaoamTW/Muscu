@@ -51,9 +51,9 @@
   width: calc(100% - var(--sp-6));
   max-width: calc(var(--app-max-width) - var(--sp-6));
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-around;
-  padding: var(--sp-2) var(--sp-2);
+  padding: var(--sp-3) var(--sp-2);
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -63,6 +63,11 @@
   z-index: 30;
   transition: transform var(--dur-base) var(--ease-standard);
 }
+/* Masquée automatiquement quand on défilie vers le bas (voir app.js),
+   pour laisser plus de place au contenu ; reste centrée horizontalement. */
+.tabbar.is-hidden {
+  transform: translateX(-50%) translateY(160%);
+}
 
 .tab-item {
   flex: 1;
@@ -70,7 +75,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: var(--sp-2) 0 var(--sp-1);
+  padding: var(--sp-1) 0;
   color: var(--text-tertiary);
   transition: color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
 }

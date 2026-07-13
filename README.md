@@ -83,7 +83,8 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 
 ## Ce qui est fonctionnel dès maintenant
 
-- Navigation complète entre les 10 pages prévues (tabbar + liens internes).
+- Navigation complète entre les 10 pages prévues (tabbar flottante qui se
+  masque automatiquement au scroll vers le bas + liens internes).
 - Choix d'un objectif à l'onboarding, sauvegardé dans IndexedDB.
 - **Génération automatique de programme** selon l'objectif choisi (16
   objectifs couverts), affiché sur la page Programme (jours, exercices,
@@ -92,14 +93,17 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 - Bibliothèque d'exercices : lecture des exercices prédéfinis + ajout
   d'exercices personnalisés + recherche.
 - Démarrage d'une séance **directement à partir du programme généré** :
-  choix du type de séance si le programme en propose plusieurs (ex. Push /
-  Pull / Legs), affichage des exercices, du nombre de séries et des
-  répétitions cibles, saisie du poids utilisé et validation série par
-  série (facile / difficile / ratée). Chaque exercice avec charge ou
-  cardio affiche une illustration de l'équipement nécessaire et un bouton
-  **"Machine indisponible"** qui propose un exercice de remplacement
-  cohérent (même groupe musculaire). Toutes les données sont enregistrées
-  localement à la fin.
+  si le programme propose plusieurs types de séance, celui recommandé
+  aujourd'hui (le suivant dans la rotation depuis la dernière séance faite)
+  est mis en avant, tout en gardant le libre choix d'un autre type.
+  Affichage des exercices, du nombre de séries et des répétitions cibles,
+  saisie du poids utilisé et validation série par série (facile /
+  difficile / ratée). Chaque exercice avec charge ou cardio affiche une
+  illustration de l'équipement nécessaire, deux liens externes pour voir
+  une photo ou une vidéo de la machine, et un bouton **"Machine
+  indisponible"** qui propose un exercice de remplacement cohérent (même
+  groupe musculaire). Toutes les données sont enregistrées localement à la
+  fin.
 - **Système de progression intelligente** : à la fin de chaque séance,
   le moteur de règles local (`progressionEngine.js`) analyse la difficulté
   de chaque série et suggère une charge pour la prochaine fois (+5% si

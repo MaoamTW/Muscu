@@ -1,4 +1,4 @@
-import { dbPut, generateId } from "../db.js";
+import { dbPut, dbGetAll, generateId } from "../db.js";
 import { getProfile } from "../state.js";
 import { ensureProgramForObjective } from "../engine/programGenerator.js";
 import { getWeightRecommendation, analyzeSessionAndUpdateSuggestions } from "../engine/progressionEngine.js";
@@ -110,10 +110,40 @@ export async function render(container) {
   }
 
   const program = await ensureProgramForObjective(profile.objective);
-  renderDayPicker(container, profile, program);
+  await renderDayPicker(container, profile, program);
 }
 
-function renderDayPicker(container, profile, program) {
+/**
+ * Détermine l'index du "prochain type de séance" dans la rotation du
+ * programme, à partir de la dernière séance effectuée sur cet objectif.
+ * Permet de proposer directement la séance suivante une fois la séance du
+ * jour terminée (ex : après "Push", "Pull" est recommandé la fois d'après),
+ * sans jamais bloquer le choix libre d'un autre type de séance.
+ */
+function getRecommendedDayIndex(program, allSessions) {
+  if (program.days.length <= 1) return 0;
+
+  const relevant = allSessions
+    .filter((s) => s.objectiveId === program.objectiveId)
+    .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+
+  if (relevant.length === 0) return 0;
+
+  const lastIndex = program.days.findIndex((d) => d.name === relevant[0].dayName);
+  if (lastIndex === -1) return 0;
+
+  return (lastIndex + 1) % program.days.length;
+}
+
+async function renderDayPicker(container, profile, program) {
+  const allSessions = await dbGetAll("sessions");
+  const recommendedIndex = getRecommendedDayIndex(program, allSessions);
+  const hasRotation = program.days.length > 1;
+
+  const orderedDays = program.days
+    .map((day, index) => ({ day, index }))
+    .sort((a, b) => (a.index === recommendedIndex ? -1 : b.index === recommendedIndex ? 1 : 0));
+
   container.innerHTML = `
     <div class="card">
       <span class="page-eyebrow">Objectif actuel</span>
@@ -122,12 +152,17 @@ function renderDayPicker(container, profile, program) {
     </div>
 
     <div class="section">
-      <div class="section-title">${program.days.length > 1 ? "Choisis la séance du jour" : "Séance du jour"}</div>
-      ${program.days
+      <div class="section-title">${hasRotation ? "Choisis la séance du jour" : "Séance du jour"}</div>
+      ${orderedDays
         .map(
-          (day, index) => `
+          ({ day, index }) => `
         <button class="card day-picker-card" data-start-day="${index}" style="margin-top: var(--sp-3);">
           <div>
+            ${
+              hasRotation && index === recommendedIndex
+                ? `<span class="badge badge-accent" style="margin-bottom: var(--sp-2); display:inline-flex;">Recommandé aujourd'hui</span>`
+                : ""
+            }
             <div class="card-title">${day.name}</div>
             <div class="day-picker-sub">${day.exercises.length} exercice${day.exercises.length > 1 ? "s" : ""}</div>
           </div>
@@ -231,9 +266,22 @@ function renderSuggestionBanner(exercise) {
  * Bandeau illustrant l'équipement requis (icône générique par catégorie,
  * voir js/data/equipment.js) + bouton "Machine indisponible", pour les
  * exercices "en répétitions" et "en durée" (musculation avec charge / cardio).
+ * Comme l'application ne peut pas intégrer de vraies photos de matériel
+ * (hors ligne + droits d'auteur, voir cahier des charges), deux liens
+ * externes ouvrent une recherche photo/vidéo pour identifier la machine.
  */
+function equipmentSearchLinks(exerciseName) {
+  const query = encodeURIComponent(`${exerciseName} musculation exercice`);
+  const videoQuery = encodeURIComponent(`${exerciseName} comment faire exercice technique`);
+  return {
+    photoUrl: `https://www.google.com/search?tbm=isch&q=${query}`,
+    videoUrl: `https://www.youtube.com/results?search_query=${videoQuery}`,
+  };
+}
+
 function renderEquipmentRow(exercise, exIndex) {
   const label = EQUIPMENT_LABELS[exercise.equipment] || "Équipement";
+  const { photoUrl, videoUrl } = equipmentSearchLinks(exercise.name);
   return `
     <div class="equipment-row">
       <div class="equipment-icon-wrap">
@@ -244,6 +292,14 @@ function renderEquipmentRow(exercise, exIndex) {
         ${exercise.isSubstituted ? `<span class="substitution-note">Remplace : ${exercise.originalName}</span>` : "Matériel nécessaire"}
       </div>
       <button class="btn-unavailable" data-substitute="${exIndex}">Machine indisponible</button>
+    </div>
+    <div class="equipment-links">
+      <a class="equipment-link" href="${photoUrl}" target="_blank" rel="noopener noreferrer">
+        <span class="icon icon-photo"></span> Voir une photo
+      </a>
+      <a class="equipment-link" href="${videoUrl}" target="_blank" rel="noopener noreferrer">
+        <span class="icon icon-video"></span> Voir une vidéo
+      </a>
     </div>
   `;
 }

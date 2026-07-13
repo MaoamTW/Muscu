@@ -287,6 +287,25 @@
   margin-top: 2px;
 }
 
+.equipment-links {
+  display: flex;
+  gap: var(--sp-5);
+  margin-top: var(--sp-3);
+  padding-left: var(--sp-1);
+}
+.equipment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--accent-2);
+}
+.equipment-link .icon {
+  width: 15px;
+  height: 15px;
+}
+
 .duration-row {
   display: flex;
   align-items: center;
