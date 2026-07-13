@@ -9,11 +9,18 @@ function formatDuration(seconds = 0) {
 }
 
 function renderExercise(ex) {
+  const substitutionNote = ex.isSubstituted
+    ? `<div class="exercise-sub">Remplace : ${ex.originalName}</div>`
+    : "";
+
   if (ex.type === "duration") {
     return `
       <div class="exercise-block ${ex.validated ? "is-complete" : ""}">
         <div class="exercise-block-header">
-          <span class="list-row-title">${ex.name}</span>
+          <div>
+            <span class="list-row-title">${ex.name}</span>
+            ${substitutionNote}
+          </div>
           <span class="badge ${ex.validated ? "badge-success" : "badge-steel"}">
             ${ex.durationMinutes} min ${ex.validated ? "· terminé" : ""}
           </span>
@@ -22,21 +29,51 @@ function renderExercise(ex) {
     `;
   }
 
-  const isHold = ex.type === "hold";
+  if (ex.type === "hold") {
+    return `
+      <div class="exercise-block">
+        <div class="exercise-block-header">
+          <span class="list-row-title">${ex.name}</span>
+        </div>
+        ${(ex.sets || [])
+          .map(
+            (set) => `
+          <div class="set-row ${set.validated ? "is-validated" : ""}" style="grid-template-columns: 28px 1fr 1fr 32px;">
+            <span class="set-index">#${set.index + 1}</span>
+            <span class="set-target">${set.targetLabel} maintien</span>
+            <span></span>
+            <span class="icon icon-check" style="opacity:${set.validated ? 1 : 0.2};"></span>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  const STATUS_LABEL = { easy: "Facile", hard: "Difficile", failed: "Ratée" };
+  const STATUS_BADGE = { easy: "badge-success", hard: "badge-steel", failed: "badge-danger" };
 
   return `
     <div class="exercise-block">
       <div class="exercise-block-header">
-        <span class="list-row-title">${ex.name}</span>
+        <div>
+          <span class="list-row-title">${ex.name}</span>
+          ${substitutionNote}
+        </div>
       </div>
       ${(ex.sets || [])
         .map(
           (set) => `
-        <div class="set-row ${set.validated ? "is-validated" : ""}" style="grid-template-columns: 28px 1fr 1fr 32px;">
+        <div class="set-row" style="grid-template-columns: 28px 1fr 1fr 90px;">
           <span class="set-index">#${set.index + 1}</span>
-          <span class="set-target">${set.targetLabel}${isHold ? " maintien" : " reps"}</span>
+          <span class="set-target">${set.targetLabel} reps</span>
           <span>${set.weight || "—"} kg</span>
-          <span class="icon icon-check" style="opacity:${set.validated ? 1 : 0.2};"></span>
+          ${
+            set.status
+              ? `<span class="badge ${STATUS_BADGE[set.status]}">${STATUS_LABEL[set.status]}</span>`
+              : `<span class="card-sub">Non renseignée</span>`
+          }
         </div>
       `
         )

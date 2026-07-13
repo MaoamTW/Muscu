@@ -7,7 +7,7 @@
  * Incrémenter CACHE_NAME force le renouvellement du cache lors d'un déploiement.
  */
 
-const CACHE_NAME = "forge-cache-v3";
+const CACHE_NAME = "forge-cache-v9";
 
 const APP_SHELL_FILES = [
   "./",
@@ -27,11 +27,15 @@ const APP_SHELL_FILES = [
   "./js/state.js",
   "./js/data/objectives.js",
   "./js/data/programTemplates.js",
+  "./js/data/equipment.js",
   "./js/components/ring.js",
   "./js/components/toast.js",
+  "./js/components/barChart.js",
   "./js/engine/programGenerator.js",
   "./js/engine/progressionEngine.js",
   "./js/engine/recordsEngine.js",
+  "./js/engine/statsEngine.js",
+  "./js/engine/substitutionEngine.js",
   "./js/pages/onboarding.js",
   "./js/pages/home.js",
   "./js/pages/program.js",
@@ -49,6 +53,8 @@ const APP_SHELL_FILES = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
+  "./icons/favicon-32.png",
+  "./icons/favicon-16.png",
 ];
 
 self.addEventListener("install", (event) => {

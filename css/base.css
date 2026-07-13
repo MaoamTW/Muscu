@@ -9,7 +9,8 @@ html, body {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-mid) 55%, var(--bg-end) 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-system);
   font-size: var(--fs-body);
@@ -60,6 +61,33 @@ ul {
   display: flex;
   flex-direction: column;
   position: relative;
+  isolation: isolate; /* garde les halos décoratifs sous le contenu */
+}
+
+/* Halos lumineux discrets, décoratifs uniquement — donnent au verre des
+   cartes quelque chose de subtil à travers lequel transparaître. */
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+}
+.app-shell::before {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  left: -60px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+}
+.app-shell::after {
+  width: 380px;
+  height: 380px;
+  bottom: 10%;
+  right: -100px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.14) 0%, transparent 70%);
 }
 
 .app-header {
@@ -67,21 +95,44 @@ ul {
   top: 0;
   z-index: 20;
   padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-5) var(--sp-3);
-  background: linear-gradient(to bottom, rgba(18,20,26,0.97) 70%, rgba(18,20,26,0));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: linear-gradient(to bottom, rgba(10, 10, 13, 0.9) 65%, rgba(10, 10, 13, 0));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .view {
   flex: 1;
-  padding: var(--sp-2) var(--sp-5) calc(var(--tabbar-height) + var(--safe-bottom) + var(--sp-8));
+  padding: var(--sp-3) var(--sp-5) calc(var(--tabbar-height) + var(--safe-bottom) + var(--sp-10));
   animation: view-enter var(--dur-base) var(--ease-standard);
 }
 
 @keyframes view-enter {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Apparition en douceur des cartes, avec un léger décalage entre elles
+   (stagger) pour un effet premium sans dépendre du JavaScript. */
+.card,
+.stat-tile,
+.exercise-block,
+.set-card,
+.day-picker-card,
+.objective-card,
+.record-row,
+.list-row {
+  animation: card-enter var(--dur-slow) var(--ease-standard) backwards;
+}
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.view > *:nth-child(1) { animation-delay: 0ms; }
+.view > *:nth-child(2) { animation-delay: 40ms; }
+.view > *:nth-child(3) { animation-delay: 80ms; }
+.view > *:nth-child(4) { animation-delay: 120ms; }
+.view > *:nth-child(5) { animation-delay: 160ms; }
+.view > *:nth-child(n+6) { animation-delay: 200ms; }
 
 /* Scrollbar discrète */
 ::-webkit-scrollbar {

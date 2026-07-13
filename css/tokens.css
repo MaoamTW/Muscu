@@ -1,49 +1,59 @@
 /*
-  FORGE — Design tokens
-  Direction : "Hybride" validée dans le cahier des charges.
-  Base sombre premium (graphite chaud) + accent cuivre/braise (identité "forge",
-  matière chauffée/travaillée) + bleu acier en accent secondaire pour la donnée
-  (stats, records). Police système (SF Pro sur iPhone) pour une sensation native,
-  travaillée via graisse/espacement plutôt que par une police téléchargée
-  (garantit aussi le rendu 100% hors-ligne dès la première ouverture).
+  FORGE — Design tokens (v3 — Glassmorphism violet/magenta)
+  Direction validée : fond sombre dégradé + cartes en verre (blur, bordure
+  fine, ombre douce, coins très arrondis) + dégradé violet → magenta comme
+  identité de marque (logo FORGE). Police système (SF Pro sur iPhone) pour
+  une sensation native, garantissant aussi le rendu 100% hors-ligne dès la
+  première ouverture.
 */
 
 :root {
-  /* Surfaces */
-  --bg: #12141A;
-  --bg-elevated: #171A21;
-  --surface: #1B1E26;
-  --surface-alt: #23262F;
-  --surface-hover: #2A2E38;
-  --border: #2E323C;
-  --border-soft: #23262F;
+  /* Fond (dégradé sombre très discret, teinte violette, voir base.css pour son application) */
+  --bg-start: #0A0710;
+  --bg-mid: #120B1C;
+  --bg-end: #170F22;
+
+  /* Verre (glassmorphism) */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-soft: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-blur: 22px;
+
+  /* Surfaces "solides" restantes (inputs, éléments internes) */
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-alt: rgba(255, 255, 255, 0.08);
+  --surface-hover: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.14);
+  --border-soft: rgba(255, 255, 255, 0.08);
 
   /* Texte */
-  --text-primary: #F5F3EF;
-  --text-secondary: #9CA0AC;
-  --text-tertiary: #676C78;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B9BAC2;
+  --text-tertiary: #82838C;
 
   /* Accents */
-  --accent: #FF6B4A;          /* cuivre / braise — actions principales, CTA */
-  --accent-strong: #FF8563;
-  --accent-soft: rgba(255, 107, 74, 0.14);
-  --accent-2: #5B8DEF;        /* acier — données, records, secondaire */
-  --accent-2-soft: rgba(91, 141, 239, 0.14);
-  --success: #4ADE80;
-  --success-soft: rgba(74, 222, 128, 0.14);
+  --accent: #C026D3;               /* magenta — unique couleur d'action */
+  --accent-strong: #E879C9;
+  --accent-soft: rgba(192, 38, 211, 0.16);
+  --accent-2: #A78BFA;             /* violet clair — données secondaires uniquement */
+  --accent-2-soft: rgba(167, 139, 250, 0.16);
+  --success: #34D399;
+  --success-soft: rgba(52, 211, 153, 0.16);
   --danger: #FF5470;
-  --danger-soft: rgba(255, 84, 112, 0.14);
+  --danger-soft: rgba(255, 84, 112, 0.16);
 
-  /* Dégradé signature (utilisé sur les anneaux de progression) */
-  --gradient-forge: linear-gradient(135deg, var(--accent) 0%, #FF8F3D 100%);
-  --gradient-steel: linear-gradient(135deg, var(--accent-2) 0%, #7FB0FF 100%);
+  /* Dégradés signature */
+  --gradient-forge: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  --gradient-steel: linear-gradient(135deg, #A78BFA 0%, #D8B4FE 100%);
 
   /* Typographie */
   --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
     "Helvetica Neue", Arial, sans-serif;
   --font-mono-nums: "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --fs-display: 2.5rem;   /* gros chiffres (stats, records) */
+  --fs-display: 2.5rem;
   --fs-h1: 1.75rem;
   --fs-h2: 1.25rem;
   --fs-body: 1rem;
@@ -56,39 +66,40 @@
   --fw-bold: 700;
   --fw-black: 800;
 
-  /* Espacement (échelle 4px) */
+  /* Espacement (échelle élargie pour une interface plus aérée) */
   --sp-1: 4px;
   --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 20px;
-  --sp-6: 24px;
-  --sp-8: 32px;
-  --sp-10: 40px;
-  --sp-12: 48px;
+  --sp-3: 14px;
+  --sp-4: 18px;
+  --sp-5: 24px;
+  --sp-6: 28px;
+  --sp-8: 36px;
+  --sp-10: 44px;
+  --sp-12: 56px;
 
-  /* Rayons */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
+  /* Rayons — coins très arrondis, signature du style verre */
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 26px;
   --radius-pill: 999px;
 
-  /* Ombres */
-  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-elevated: 0 16px 40px rgba(0, 0, 0, 0.45);
-  --shadow-accent-glow: 0 8px 20px rgba(255, 107, 74, 0.25);
+  /* Ombres douces et diffuses */
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.38);
+  --shadow-elevated: 0 20px 48px rgba(0, 0, 0, 0.5);
+  --shadow-accent-glow: 0 10px 28px rgba(192, 38, 211, 0.35);
+  --shadow-accent-glow-active: 0 6px 20px rgba(192, 38, 211, 0.55);
 
   /* Transitions */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --dur-fast: 150ms;
-  --dur-base: 240ms;
-  --dur-slow: 420ms;
+  --dur-fast: 160ms;
+  --dur-base: 280ms;
+  --dur-slow: 480ms;
 
   /* Layout */
   --app-max-width: 480px;
   --header-height: 56px;
-  --tabbar-height: 78px;
+  --tabbar-height: 84px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
 }

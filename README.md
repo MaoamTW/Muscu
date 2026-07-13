@@ -1,7 +1,15 @@
 # Forge — PWA de suivi de musculation
 
-Base technique de l'application (v1 du développement). Aucun compte, aucun
-serveur : toutes les données vivent dans IndexedDB, sur l'appareil.
+Base technique de l'application. Aucun compte, aucun serveur : toutes les
+données vivent dans IndexedDB, sur l'appareil.
+
+**Direction visuelle actuelle : Glassmorphism premium, dégradé violet →
+magenta.** Fond sombre en dégradé avec halos discrets, cartes en verre
+(flou, bordure fine, ombre douce, coins très arrondis), dégradé violet
+(#8B5CF6) → magenta (#EC4899) comme identité de marque (logo FORGE),
+barre de navigation flottante. Tous les tokens de couleur/espace sont
+centralisés dans `css/tokens.css` — un futur changement de thème passe
+uniquement par ce fichier.
 
 ## Lancer le projet en local
 
@@ -45,16 +53,20 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 │   │
 │   ├── /components
 │   │   ├── ring.js             → anneau de progression SVG (élément signature)
-│   │   └── toast.js             → notifications discrètes
+│   │   ├── toast.js             → notifications discrètes
+│   │   └── barChart.js           → mini graphique en barres SVG (statistiques)
 │   │
 │   ├── /data
 │   │   ├── objectives.js       → liste des 16 objectifs proposés à l'onboarding
-│   │   └── programTemplates.js → règles "objectif -> programme" (16 programmes complets)
+│   │   ├── programTemplates.js → règles "objectif -> programme" (16 programmes complets)
+│   │   └── equipment.js         → équipement par exercice + alternatives (substitution)
 │   │
 │   ├── /engine
 │   │   ├── programGenerator.js   → ✅ génère/sauvegarde le programme selon l'objectif
-│   │   ├── progressionEngine.js  → 🚧 suggestions de poids/répétitions (non implémenté)
-│   │   └── recordsEngine.js       → 🚧 détection automatique des records (non implémenté)
+│   │   ├── progressionEngine.js  → ✅ analyse les séances et suggère la charge suivante
+│   │   ├── statsEngine.js         → ✅ calcule toutes les statistiques à la volée
+│   │   ├── substitutionEngine.js   → ✅ choisit un exercice de remplacement
+│   │   └── recordsEngine.js       → 🚧 non utilisé (les records sont désormais calculés par statsEngine.js)
 │   │
 │   └── /pages                  → une page = une fonction render(container)
 │       ├── onboarding.js, home.js, program.js, session.js,
@@ -63,7 +75,7 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 │
 ├── /data
 │   ├── exercices-predefinis.json   → ~28 exercices de base, par groupe musculaire
-│   └── regles-programmes.json       → réservé au futur moteur de programme
+│   └── regles-programmes.json       → obsolète, conservé pour mémoire (voir programTemplates.js)
 │
 └── /icons                     → icônes PWA / iOS (générées, monogramme "F")
 ```
@@ -82,24 +94,36 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
   choix du type de séance si le programme en propose plusieurs (ex. Push /
   Pull / Legs), affichage des exercices, du nombre de séries et des
   répétitions cibles, saisie du poids utilisé et validation série par
-  série. Toutes les données sont enregistrées localement à la fin.
+  série (facile / difficile / ratée). Chaque exercice avec charge ou
+  cardio affiche une illustration de l'équipement nécessaire et un bouton
+  **"Machine indisponible"** qui propose un exercice de remplacement
+  cohérent (même groupe musculaire). Toutes les données sont enregistrées
+  localement à la fin.
+- **Système de progression intelligente** : à la fin de chaque séance,
+  le moteur de règles local (`progressionEngine.js`) analyse la difficulté
+  de chaque série et suggère une charge pour la prochaine fois (+5% si
+  facile, charge conservée si difficile, -10% si ratée), affichée en
+  bandeau au lancement de la séance suivante.
 - Consultation de l'historique et du détail d'une séance passée.
-- Statistiques de base calculées à partir des séances réellement enregistrées
-  (nombre de séances, minutes d'entraînement, volume total).
+- **Statistiques complètes**, recalculées automatiquement à partir des
+  séances enregistrées : nombre de séances, minutes d'entraînement, volume
+  total, série de jours consécutifs (streak), progression hebdomadaire et
+  annuelle du volume (graphiques en barres), records personnels par
+  exercice, exercices les plus réalisés, répartition du volume par groupe
+  musculaire.
+- Page Records personnels : liste des charges maximales par exercice,
+  calculée automatiquement depuis l'historique.
 - Profil : prénom, unité kg/lb, export JSON des données, import JSON,
   réinitialisation complète.
 - Fonctionne hors ligne après une première ouverture (Service Worker).
 
 ## Ce qui reste volontairement non développé (prochaines itérations)
 
-Ces éléments ont leur "emplacement" prévu dans l'architecture
-(`/js/engine/`) mais ne contiennent que des fonctions stub qui lèvent une
-erreur explicite si on essaie de les appeler :
-
-- Moteur de progression intelligente (suggestions de poids/répétitions).
-- Détection automatique des records personnels + animations dédiées.
-- Graphiques de statistiques avancés (courbes de progression, répartition
-  musculaire, etc.) — actuellement seulement des chiffres bruts.
 - Prise en compte de contraintes personnelles (jours disponibles, matériel)
   dans la génération de programme — pour l'instant, un seul programme fixe
   par objectif.
+- Animations/mise en valeur dédiées lors d'un nouveau record (le record
+  est bien calculé et affiché, mais rien ne signale "en direct" pendant la
+  séance qu'un record vient d'être battu).
+- Filtres de période sur les statistiques (7 jours / 30 jours / 1 an...) :
+  les graphiques actuels montrent toujours 8 semaines / 12 mois fixes.

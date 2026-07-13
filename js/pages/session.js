@@ -1,6 +1,9 @@
 import { dbPut, generateId } from "../db.js";
 import { getProfile } from "../state.js";
 import { ensureProgramForObjective } from "../engine/programGenerator.js";
+import { getSuggestionForExercise, analyzeSessionAndUpdateSuggestions } from "../engine/progressionEngine.js";
+import { getEquipmentInfo, EQUIPMENT_LABELS } from "../data/equipment.js";
+import { pickReplacement } from "../engine/substitutionEngine.js";
 import { showToast } from "../components/toast.js";
 import { navigateTo } from "../router.js";
 
@@ -14,20 +17,33 @@ function formatTime(totalSeconds) {
   return `${m}:${s}`;
 }
 
-/** Construit l'état initial des exercices d'une séance à partir d'un jour de programme. */
-function buildExercisesFromDay(day) {
-  return day.exercises.map((ex) => {
+/**
+ * Construit l'état initial des exercices d'une séance à partir d'un jour de
+ * programme. Pour les exercices "en répétitions" et "en durée", va chercher
+ * l'équipement associé (js/data/equipment.js), utile pour l'illustration et
+ * le bouton "Machine indisponible". Pour les exercices "en répétitions",
+ * va aussi chercher la suggestion de charge du moteur de progression.
+ */
+async function buildExercisesFromDay(day, objectiveId) {
+  const exercises = [];
+
+  for (const ex of day.exercises) {
     if (ex.durationMinutes != null) {
-      return {
+      exercises.push({
         type: "duration",
         name: ex.name,
+        originalName: ex.name,
+        triedNames: [ex.name],
+        equipment: getEquipmentInfo(ex.name).equipment,
         durationMinutes: ex.durationMinutes,
         note: ex.note || null,
         validated: false,
-      };
+      });
+      continue;
     }
+
     if (ex.holdSeconds != null) {
-      return {
+      exercises.push({
         type: "hold",
         name: ex.name,
         note: ex.note || null,
@@ -37,29 +53,48 @@ function buildExercisesFromDay(day) {
           weight: "",
           validated: false,
         })),
-      };
+      });
+      continue;
     }
-    return {
+
+    const suggestion = await getSuggestionForExercise(objectiveId, ex.name);
+    const prefillWeight = suggestion ? String(suggestion.suggestedWeight) : "";
+
+    exercises.push({
       type: "reps",
       name: ex.name,
+      originalName: ex.name,
+      triedNames: [ex.name],
+      equipment: getEquipmentInfo(ex.name).equipment,
       restSeconds: ex.restSeconds || null,
+      suggestion,
       sets: Array.from({ length: ex.sets }, (_, i) => ({
         index: i,
         targetLabel: ex.reps,
-        weight: "",
-        validated: false,
+        weight: prefillWeight,
+        status: null, // null | "easy" | "hard" | "failed"
       })),
-    };
-  });
+    });
+  }
+
+  return exercises;
 }
 
 export async function render(container) {
+  const profile = await getProfile();
+
+  // Si une séance était en cours mais que l'objectif a changé depuis (ex : changement
+  // de programme sans avoir annulé/terminé la séance), elle n'est plus valide : on
+  // l'abandonne pour proposer directement le nouveau programme.
+  if (currentSession && currentSession.objectiveId !== profile.objective) {
+    clearInterval(timerInterval);
+    currentSession = null;
+  }
+
   if (currentSession) {
     renderActiveSession(container);
     return;
   }
-
-  const profile = await getProfile();
 
   if (!profile.objective) {
     container.innerHTML = `
@@ -105,15 +140,16 @@ function renderDayPicker(container, profile, program) {
   `;
 
   container.querySelectorAll("[data-start-day]").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const day = program.days[Number(btn.dataset.startDay)];
+      const exercises = await buildExercisesFromDay(day, program.objectiveId);
       currentSession = {
         id: generateId("session"),
         objectiveId: program.objectiveId,
         objectiveLabel: program.objectiveLabel,
         dayName: day.name,
         startedAt: new Date().toISOString(),
-        exercises: buildExercisesFromDay(day),
+        exercises,
       };
       elapsedSeconds = 0;
       startTimer();
@@ -133,7 +169,8 @@ function startTimer() {
 
 function isExerciseComplete(ex) {
   if (ex.type === "duration") return ex.validated;
-  return ex.sets.every((s) => s.validated);
+  if (ex.type === "hold") return ex.sets.every((s) => s.validated);
+  return ex.sets.every((s) => s.status !== null);
 }
 
 function renderActiveSession(container) {
@@ -161,6 +198,44 @@ function renderActiveSession(container) {
   bindActiveSessionEvents(container);
 }
 
+function renderSuggestionBanner(exercise) {
+  const s = exercise.suggestion;
+  if (!s) return "";
+
+  const outcomeLabel = { easy: "facile 📈", hard: "difficile ➡️", failed: "ratée 📉" }[s.outcome] || "";
+
+  return `
+    <div class="suggestion-banner">
+      <span>💡</span>
+      <span>
+        Suggestion basée sur ta dernière séance (<strong>${outcomeLabel}</strong>) :
+        <strong>${s.suggestedWeight} kg</strong> conseillés aujourd'hui (précédemment ${s.lastWeight} kg).
+      </span>
+    </div>
+  `;
+}
+
+/**
+ * Bandeau illustrant l'équipement requis (icône générique par catégorie,
+ * voir js/data/equipment.js) + bouton "Machine indisponible", pour les
+ * exercices "en répétitions" et "en durée" (musculation avec charge / cardio).
+ */
+function renderEquipmentRow(exercise, exIndex) {
+  const label = EQUIPMENT_LABELS[exercise.equipment] || "Équipement";
+  return `
+    <div class="equipment-row">
+      <div class="equipment-icon-wrap">
+        <span class="equipment-icon" data-equip="${exercise.equipment}"></span>
+      </div>
+      <div class="equipment-label">
+        <strong>${label}</strong>
+        ${exercise.isSubstituted ? `<span class="substitution-note">Remplace : ${exercise.originalName}</span>` : "Matériel nécessaire"}
+      </div>
+      <button class="btn-unavailable" data-substitute="${exIndex}">Machine indisponible</button>
+    </div>
+  `;
+}
+
 function renderExerciseBlock(exercise, exIndex) {
   const complete = isExerciseComplete(exercise);
 
@@ -174,6 +249,9 @@ function renderExerciseBlock(exercise, exIndex) {
           </div>
           <span class="badge badge-steel">${exercise.durationMinutes} min</span>
         </div>
+
+        ${renderEquipmentRow(exercise, exIndex)}
+
         <div class="duration-row">
           <span class="duration-label">${complete ? "Terminé" : "À faire"}</span>
           <button class="set-validate-btn ${complete ? "is-active" : ""}" data-toggle-duration="${exIndex}" aria-label="Valider">
@@ -184,35 +262,67 @@ function renderExerciseBlock(exercise, exIndex) {
     `;
   }
 
-  const isHold = exercise.type === "hold";
+  if (exercise.type === "hold") {
+    return `
+      <div class="exercise-block ${complete ? "is-complete" : ""}">
+        <div class="exercise-block-header">
+          <div>
+            <span class="list-row-title">${exercise.name}</span>
+            ${exercise.note ? `<div class="exercise-sub">${exercise.note}</div>` : ""}
+          </div>
+          <span class="badge badge-accent">${exercise.sets.length} série${exercise.sets.length > 1 ? "s" : ""}</span>
+        </div>
+        ${exercise.sets
+          .map(
+            (set) => `
+          <div class="set-row ${set.validated ? "is-validated" : ""}">
+            <span class="set-index">#${set.index + 1}</span>
+            <span class="set-target">${set.targetLabel} maintien</span>
+            <span></span>
+            <button class="set-validate-btn ${set.validated ? "is-active" : ""}"
+              data-toggle-hold="${exIndex}-${set.index}" aria-label="Valider la série">
+              <span class="icon icon-check"></span>
+            </button>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    `;
+  }
 
+  // Exercice "en répétitions" : équipement + suggestion de charge + statut par série
   return `
     <div class="exercise-block ${complete ? "is-complete" : ""}">
       <div class="exercise-block-header">
         <div>
           <span class="list-row-title">${exercise.name}</span>
-          ${
-            exercise.restSeconds
-              ? `<div class="exercise-sub">Repos conseillé : ${exercise.restSeconds}s</div>`
-              : exercise.note
-              ? `<div class="exercise-sub">${exercise.note}</div>`
-              : ""
-          }
+          ${exercise.restSeconds ? `<div class="exercise-sub">Repos conseillé : ${exercise.restSeconds}s</div>` : ""}
         </div>
         <span class="badge badge-accent">${exercise.sets.length} série${exercise.sets.length > 1 ? "s" : ""}</span>
       </div>
+
+      ${renderEquipmentRow(exercise, exIndex)}
+      ${renderSuggestionBanner(exercise)}
+
       ${exercise.sets
         .map(
           (set) => `
-        <div class="set-row ${set.validated ? "is-validated" : ""}">
-          <span class="set-index">#${set.index + 1}</span>
-          <span class="set-target">${set.targetLabel}${isHold ? " maintien" : " reps"}</span>
-          <input type="number" inputmode="decimal" placeholder="kg" value="${set.weight}"
-            data-set-field="${exIndex}-${set.index}" ${set.validated ? "disabled" : ""} />
-          <button class="set-validate-btn ${set.validated ? "is-active" : ""}"
-            data-toggle-set="${exIndex}-${set.index}" aria-label="Valider la série">
-            <span class="icon icon-check"></span>
-          </button>
+        <div class="set-card ${set.status ? "is-done" : ""}">
+          <div class="set-card-top">
+            <span class="set-index">#${set.index + 1}</span>
+            <span class="set-target">${set.targetLabel} reps</span>
+            <input type="number" inputmode="decimal" placeholder="kg" value="${set.weight}"
+              data-set-field="${exIndex}-${set.index}" />
+          </div>
+          <div class="set-status-group">
+            <button class="set-status-btn status-failed ${set.status === "failed" ? "is-active" : ""}"
+              data-set-status="${exIndex}-${set.index}-failed">Ratée</button>
+            <button class="set-status-btn status-hard ${set.status === "hard" ? "is-active" : ""}"
+              data-set-status="${exIndex}-${set.index}-hard">Difficile</button>
+            <button class="set-status-btn status-easy ${set.status === "easy" ? "is-active" : ""}"
+              data-set-status="${exIndex}-${set.index}-easy">Facile</button>
+          </div>
         </div>
       `
         )
@@ -229,9 +339,19 @@ function bindActiveSessionEvents(container) {
     });
   });
 
-  container.querySelectorAll("[data-toggle-set]").forEach((btn) => {
+  container.querySelectorAll("[data-set-status]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const [exIndex, setIndex] = btn.dataset.toggleSet.split("-").map(Number);
+      const [exIndex, setIndex, status] = btn.dataset.setStatus.split("-");
+      const set = currentSession.exercises[Number(exIndex)].sets[Number(setIndex)];
+      // Cliquer à nouveau sur le même statut le désélectionne (retour à "non renseigné").
+      set.status = set.status === status ? null : status;
+      renderActiveSession(container);
+    });
+  });
+
+  container.querySelectorAll("[data-toggle-hold]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const [exIndex, setIndex] = btn.dataset.toggleHold.split("-").map(Number);
       const set = currentSession.exercises[exIndex].sets[setIndex];
       set.validated = !set.validated;
       renderActiveSession(container);
@@ -243,6 +363,34 @@ function bindActiveSessionEvents(container) {
       const exIndex = Number(btn.dataset.toggleDuration);
       const ex = currentSession.exercises[exIndex];
       ex.validated = !ex.validated;
+      renderActiveSession(container);
+    });
+  });
+
+  container.querySelectorAll("[data-substitute]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const exIndex = Number(btn.dataset.substitute);
+      const ex = currentSession.exercises[exIndex];
+
+      const nextName = pickReplacement(ex.name, ex.triedNames);
+      if (!nextName) {
+        showToast("Aucun exercice de remplacement disponible pour cet exercice.");
+        return;
+      }
+
+      ex.triedNames.push(nextName);
+      ex.name = nextName;
+      ex.equipment = getEquipmentInfo(nextName).equipment;
+      ex.isSubstituted = true;
+
+      if (ex.type === "reps") {
+        const suggestion = await getSuggestionForExercise(currentSession.objectiveId, nextName);
+        const prefillWeight = suggestion ? String(suggestion.suggestedWeight) : "";
+        ex.suggestion = suggestion;
+        ex.sets = ex.sets.map((s) => ({ ...s, weight: prefillWeight, status: null }));
+      }
+
+      showToast(`Remplacé par : ${nextName}`);
       renderActiveSession(container);
     });
   });
@@ -263,8 +411,9 @@ function bindActiveSessionEvents(container) {
       durationSeconds: elapsedSeconds,
     };
     await dbPut("sessions", sessionToSave);
+    await analyzeSessionAndUpdateSuggestions(sessionToSave);
     currentSession = null;
-    showToast("Séance enregistrée");
+    showToast("Séance enregistrée — progression mise à jour");
     navigateTo("history");
   });
 }

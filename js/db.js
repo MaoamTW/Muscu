@@ -18,9 +18,9 @@
  */
 
 const DB_NAME = "forge-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
-const STORES = ["profile", "exercises", "sessions", "templates", "records"];
+const STORES = ["profile", "exercises", "sessions", "templates", "records", "suggestions"];
 
 let dbPromise = null;
 

@@ -23,8 +23,8 @@ export function renderRing(progress, opts = {}) {
       <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
         <defs>
           <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="var(--accent)" />
-            <stop offset="100%" stop-color="#FF8F3D" />
+            <stop offset="0%" stop-color="#8B5CF6" />
+            <stop offset="100%" stop-color="#EC4899" />
           </linearGradient>
         </defs>
         <circle class="ring-track" cx="${size / 2}" cy="${size / 2}" r="${radius}" stroke-width="${strokeWidth}" />
