@@ -513,3 +513,66 @@
   from { opacity: 0; transform: translateY(10px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ==================== Chrono de repos automatique ==================== */
+.rest-timer-bar {
+  position: fixed;
+  bottom: calc(var(--tabbar-height) + var(--safe-bottom) + var(--sp-4));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - var(--sp-6));
+  max-width: calc(var(--app-max-width) - var(--sp-6));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+  animation: toast-in var(--dur-base) var(--ease-spring);
+}
+.rest-timer-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.rest-timer-label {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.rest-timer-value {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+.rest-timer-track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.rest-timer-fill {
+  height: 100%;
+  background: var(--gradient-forge);
+  border-radius: var(--radius-pill);
+  transition: width 1s linear;
+}
+.rest-timer-skip {
+  flex: none;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+.rest-timer-skip:active { transform: scale(0.94); }

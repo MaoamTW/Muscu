@@ -4,12 +4,17 @@ import { ensureProgramForObjective } from "../engine/programGenerator.js";
 import { getWeightRecommendation, analyzeSessionAndUpdateSuggestions } from "../engine/progressionEngine.js";
 import { getEquipmentInfo, EQUIPMENT_LABELS } from "../data/equipment.js";
 import { pickReplacement } from "../engine/substitutionEngine.js";
+import { adaptDayToDuration, estimateDayDuration, DURATION_OPTIONS, HOLD_REST_SECONDS } from "../engine/durationAdapter.js";
 import { showToast } from "../components/toast.js";
 import { navigateTo } from "../router.js";
 
 let timerInterval = null;
 let elapsedSeconds = 0;
 let currentSession = null; // { id, objectiveId, objectiveLabel, dayName, startedAt, exercises: [...] }
+
+let restTimerInterval = null;
+let restTimerRemaining = 0;
+let restTimerTotal = 0;
 
 function formatTime(totalSeconds) {
   const m = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
@@ -88,6 +93,9 @@ export async function render(container) {
   // l'abandonne pour proposer directement le nouveau programme.
   if (currentSession && currentSession.objectiveId !== profile.objective) {
     clearInterval(timerInterval);
+    clearInterval(restTimerInterval);
+    restTimerInterval = null;
+    hideRestTimer();
     currentSession = null;
   }
 
@@ -175,22 +183,79 @@ async function renderDayPicker(container, profile, program) {
   `;
 
   container.querySelectorAll("[data-start-day]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
+    btn.addEventListener("click", () => {
       const day = program.days[Number(btn.dataset.startDay)];
-      const exercises = await buildExercisesFromDay(day, program.objectiveId, profile.bodyWeightKg);
-      currentSession = {
-        id: generateId("session"),
-        objectiveId: program.objectiveId,
-        objectiveLabel: program.objectiveLabel,
-        dayName: day.name,
-        startedAt: new Date().toISOString(),
-        exercises,
-      };
-      elapsedSeconds = 0;
-      startTimer();
-      render(container);
+      renderDurationPicker(container, profile, program, day);
     });
   });
+}
+
+/** Écran intermédiaire : choix de la durée disponible avant de démarrer la séance. */
+function renderDurationPicker(container, profile, program, day) {
+  const baselineMinutes = Math.round(estimateDayDuration(day) / 60);
+
+  container.innerHTML = `
+    <div class="card">
+      <span class="page-eyebrow">${program.objectiveLabel}</span>
+      <div class="card-title">${day.name}</div>
+      <div class="card-sub">Durée normale estimée : environ ${baselineMinutes} min</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Combien de temps as-tu aujourd'hui ?</div>
+      ${DURATION_OPTIONS.map(
+        (opt, index) => `
+        <button class="card day-picker-card" data-pick-duration="${index}" style="margin-top: var(--sp-3);">
+          <div>
+            <div class="card-title">${opt.label}</div>
+            ${
+              opt.minutes === null
+                ? `<div class="day-picker-sub">Séries et repos tels que prévus par le programme</div>`
+                : `<div class="day-picker-sub">La séance s'adapte automatiquement pour tenir dans ce temps</div>`
+            }
+          </div>
+          <span class="icon icon-chevron"></span>
+        </button>
+      `
+      ).join("")}
+    </div>
+
+    <div class="section">
+      <button class="btn-ghost" id="back-to-day-picker">← Choisir un autre type de séance</button>
+    </div>
+  `;
+
+  container.querySelectorAll("[data-pick-duration]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const option = DURATION_OPTIONS[Number(btn.dataset.pickDuration)];
+      await startSession(container, profile, program, day, option);
+    });
+  });
+
+  container.querySelector("#back-to-day-picker").addEventListener("click", () => {
+    renderDayPicker(container, profile, program);
+  });
+}
+
+/** Adapte le jour choisi à la durée sélectionnée, construit la séance et la démarre. */
+async function startSession(container, profile, program, day, durationOption) {
+  const adapted = adaptDayToDuration(day, durationOption.minutes);
+  const exercises = await buildExercisesFromDay(adapted, program.objectiveId, profile.bodyWeightKg);
+
+  currentSession = {
+    id: generateId("session"),
+    objectiveId: program.objectiveId,
+    objectiveLabel: program.objectiveLabel,
+    dayName: day.name,
+    startedAt: new Date().toISOString(),
+    targetDurationMinutes: durationOption.minutes,
+    estimatedDurationSeconds: adapted.estimatedSeconds,
+    adjustments: adapted.adjustments,
+    exercises,
+  };
+  elapsedSeconds = 0;
+  startTimer();
+  render(container);
 }
 
 function startTimer() {
@@ -202,6 +267,69 @@ function startTimer() {
   }, 1000);
 }
 
+/**
+ * Chrono de repos automatique : se déclenche tout seul dès qu'une série ou
+ * un exercice de maintien est marqué comme fait, pour ne jamais avoir à
+ * ouvrir un chrono manuellement. Affiché dans une barre persistante
+ * (#rest-timer-root, voir index.html) indépendante du rendu de la page,
+ * pour rester visible même si on navigue ailleurs pendant le repos.
+ */
+function startRestTimer(seconds) {
+  clearInterval(restTimerInterval);
+  if (!seconds || seconds <= 0) return;
+
+  restTimerTotal = seconds;
+  restTimerRemaining = seconds;
+  renderRestTimer();
+
+  restTimerInterval = setInterval(() => {
+    restTimerRemaining -= 1;
+    if (restTimerRemaining <= 0) {
+      clearInterval(restTimerInterval);
+      restTimerInterval = null;
+      hideRestTimer();
+      showToast("Repos terminé — c'est reparti 💪");
+      if (navigator.vibrate) {
+        try {
+          navigator.vibrate([200, 100, 200]);
+        } catch (err) {
+          // Vibration non supportée (ex: Safari iOS) — pas bloquant.
+        }
+      }
+      return;
+    }
+    renderRestTimer();
+  }, 1000);
+}
+
+function renderRestTimer() {
+  const root = document.getElementById("rest-timer-root");
+  if (!root) return;
+
+  const percent = Math.max(0, Math.round((restTimerRemaining / restTimerTotal) * 100));
+  root.style.display = "flex";
+  root.innerHTML = `
+    <div class="rest-timer-info">
+      <span class="rest-timer-label">Repos</span>
+      <span class="rest-timer-value">${formatTime(restTimerRemaining)}</span>
+    </div>
+    <div class="rest-timer-track"><div class="rest-timer-fill" style="width:${percent}%"></div></div>
+    <button class="rest-timer-skip" id="rest-timer-skip">Passer</button>
+  `;
+  document.getElementById("rest-timer-skip").addEventListener("click", () => {
+    clearInterval(restTimerInterval);
+    restTimerInterval = null;
+    hideRestTimer();
+  });
+}
+
+function hideRestTimer() {
+  const root = document.getElementById("rest-timer-root");
+  if (!root) return;
+  root.style.display = "none";
+  root.innerHTML = "";
+}
+
 function isExerciseComplete(ex) {
   if (ex.type === "duration") return ex.validated;
   if (ex.type === "hold") return ex.sets.every((s) => s.validated);
@@ -209,10 +337,19 @@ function isExerciseComplete(ex) {
 }
 
 function renderActiveSession(container) {
+  const durationLabel =
+    currentSession.targetDurationMinutes != null
+      ? `${currentSession.targetDurationMinutes} min choisies`
+      : "Programme complet";
+  const adjustmentsLabel = currentSession.adjustments?.length
+    ? ` · Adapté : ${currentSession.adjustments.join(", ")}`
+    : "";
+
   container.innerHTML = `
     <div class="card">
       <span class="page-eyebrow">${currentSession.objectiveLabel}</span>
       <div class="card-title">${currentSession.dayName}</div>
+      <div class="card-sub">${durationLabel}${adjustmentsLabel}</div>
     </div>
 
     <div class="session-timer">
@@ -410,9 +547,21 @@ function bindActiveSessionEvents(container) {
   container.querySelectorAll("[data-set-status]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const [exIndex, setIndex, status] = btn.dataset.setStatus.split("-");
-      const set = currentSession.exercises[Number(exIndex)].sets[Number(setIndex)];
+      const exercise = currentSession.exercises[Number(exIndex)];
+      const set = exercise.sets[Number(setIndex)];
       // Cliquer à nouveau sur le même statut le désélectionne (retour à "non renseigné").
-      set.status = set.status === status ? null : status;
+      const wasSelected = set.status === status;
+      set.status = wasSelected ? null : status;
+
+      if (wasSelected) {
+        // Série "annulée" : le repos qui avait démarré n'a plus lieu d'être.
+        clearInterval(restTimerInterval);
+        restTimerInterval = null;
+        hideRestTimer();
+      } else if (exercise.restSeconds) {
+        startRestTimer(exercise.restSeconds);
+      }
+
       renderActiveSession(container);
     });
   });
@@ -422,6 +571,15 @@ function bindActiveSessionEvents(container) {
       const [exIndex, setIndex] = btn.dataset.toggleHold.split("-").map(Number);
       const set = currentSession.exercises[exIndex].sets[setIndex];
       set.validated = !set.validated;
+
+      if (set.validated) {
+        startRestTimer(HOLD_REST_SECONDS);
+      } else {
+        clearInterval(restTimerInterval);
+        restTimerInterval = null;
+        hideRestTimer();
+      }
+
       renderActiveSession(container);
     });
   });
@@ -451,6 +609,10 @@ function bindActiveSessionEvents(container) {
       ex.equipment = getEquipmentInfo(nextName).equipment;
       ex.isSubstituted = true;
 
+      clearInterval(restTimerInterval);
+      restTimerInterval = null;
+      hideRestTimer();
+
       if (ex.type === "reps") {
         const profile = await getProfile();
         const suggestion = await getWeightRecommendation(currentSession.objectiveId, nextName, profile.bodyWeightKg);
@@ -468,12 +630,18 @@ function bindActiveSessionEvents(container) {
     const confirmed = window.confirm("Annuler cette séance ? Les données saisies ne seront pas enregistrées.");
     if (!confirmed) return;
     clearInterval(timerInterval);
+    clearInterval(restTimerInterval);
+    restTimerInterval = null;
+    hideRestTimer();
     currentSession = null;
     render(container);
   });
 
   container.querySelector("#finish-session").addEventListener("click", async () => {
     clearInterval(timerInterval);
+    clearInterval(restTimerInterval);
+    restTimerInterval = null;
+    hideRestTimer();
     const sessionToSave = {
       ...currentSession,
       finishedAt: new Date().toISOString(),

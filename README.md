@@ -67,6 +67,7 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 │   │   ├── progressionEngine.js  → ✅ analyse les séances et suggère la charge suivante
 │   │   ├── statsEngine.js         → ✅ calcule toutes les statistiques à la volée
 │   │   ├── substitutionEngine.js   → ✅ choisit un exercice de remplacement
+│   │   ├── durationAdapter.js       → ✅ adapte une séance à la durée choisie
 │   │   └── recordsEngine.js       → 🚧 non utilisé (les records sont désormais calculés par statsEngine.js)
 │   │
 │   └── /pages                  → une page = une fonction render(container)
@@ -95,15 +96,21 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 - Démarrage d'une séance **directement à partir du programme généré** :
   si le programme propose plusieurs types de séance, celui recommandé
   aujourd'hui (le suivant dans la rotation depuis la dernière séance faite)
-  est mis en avant, tout en gardant le libre choix d'un autre type.
-  Affichage des exercices, du nombre de séries et des répétitions cibles,
-  saisie du poids utilisé et validation série par série (facile /
-  difficile / ratée). Chaque exercice avec charge ou cardio affiche une
-  illustration de l'équipement nécessaire, deux liens externes pour voir
-  une photo ou une vidéo de la machine, et un bouton **"Machine
-  indisponible"** qui propose un exercice de remplacement cohérent (même
-  groupe musculaire). Toutes les données sont enregistrées localement à la
-  fin.
+  est mis en avant, tout en gardant le libre choix d'un autre type. **Choix
+  de la durée disponible** (30 min / 45 min / 1h / 1h30 / programme complet)
+  avant de démarrer : la séance est automatiquement adaptée (repos réduits,
+  puis séries réduites, puis exercices retirés si besoin) pour tenir dans
+  le temps choisi, en tenant compte du temps d'exécution des exercices et
+  des repos. Affichage des exercices, du nombre de séries et des
+  répétitions cibles, saisie du poids utilisé et validation série par
+  série (facile / difficile / ratée) — **un chrono de repos démarre
+  automatiquement** à chaque série ou maintien validé, affiché dans une
+  barre persistante avec possibilité de le passer. Chaque exercice avec
+  charge ou cardio affiche une illustration de l'équipement nécessaire,
+  deux liens externes pour voir une photo ou une vidéo de la machine, et
+  un bouton **"Machine indisponible"** qui propose un exercice de
+  remplacement cohérent (même groupe musculaire). Toutes les données sont
+  enregistrées localement à la fin.
 - **Système de progression intelligente** : à la fin de chaque séance,
   le moteur de règles local (`progressionEngine.js`) analyse la difficulté
   de chaque série et suggère une charge pour la prochaine fois (+5% si
