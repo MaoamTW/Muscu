@@ -27,6 +27,10 @@ const ROUTE_META = {
 };
 
 function renderHeader(routeName) {
+  // Expose la route courante sur <body> pour permettre un léger accent de
+  // couleur différent par section (voir css/base.css), sans logique JS.
+  document.body.dataset.route = routeName || "home";
+
   const header = document.getElementById("app-header");
   const tabbar = document.getElementById("tabbar");
   const meta = ROUTE_META[routeName] || ROUTE_META.home;

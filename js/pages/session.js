@@ -1,7 +1,7 @@
 import { dbPut, generateId } from "../db.js";
 import { getProfile } from "../state.js";
 import { ensureProgramForObjective } from "../engine/programGenerator.js";
-import { getSuggestionForExercise, analyzeSessionAndUpdateSuggestions } from "../engine/progressionEngine.js";
+import { getWeightRecommendation, analyzeSessionAndUpdateSuggestions } from "../engine/progressionEngine.js";
 import { getEquipmentInfo, EQUIPMENT_LABELS } from "../data/equipment.js";
 import { pickReplacement } from "../engine/substitutionEngine.js";
 import { showToast } from "../components/toast.js";
@@ -24,7 +24,7 @@ function formatTime(totalSeconds) {
  * le bouton "Machine indisponible". Pour les exercices "en répétitions",
  * va aussi chercher la suggestion de charge du moteur de progression.
  */
-async function buildExercisesFromDay(day, objectiveId) {
+async function buildExercisesFromDay(day, objectiveId, bodyWeightKg) {
   const exercises = [];
 
   for (const ex of day.exercises) {
@@ -57,7 +57,7 @@ async function buildExercisesFromDay(day, objectiveId) {
       continue;
     }
 
-    const suggestion = await getSuggestionForExercise(objectiveId, ex.name);
+    const suggestion = await getWeightRecommendation(objectiveId, ex.name, bodyWeightKg);
     const prefillWeight = suggestion ? String(suggestion.suggestedWeight) : "";
 
     exercises.push({
@@ -142,7 +142,7 @@ function renderDayPicker(container, profile, program) {
   container.querySelectorAll("[data-start-day]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const day = program.days[Number(btn.dataset.startDay)];
-      const exercises = await buildExercisesFromDay(day, program.objectiveId);
+      const exercises = await buildExercisesFromDay(day, program.objectiveId, profile.bodyWeightKg);
       currentSession = {
         id: generateId("session"),
         objectiveId: program.objectiveId,
@@ -201,6 +201,18 @@ function renderActiveSession(container) {
 function renderSuggestionBanner(exercise) {
   const s = exercise.suggestion;
   if (!s) return "";
+
+  if (s.source === "initial") {
+    return `
+      <div class="suggestion-banner">
+        <span>⚖️</span>
+        <span>
+          Charge de départ recommandée : <strong>${s.suggestedWeight} kg</strong>,
+          estimée à partir de ton poids et de ton objectif. Ajuste-la si besoin.
+        </span>
+      </div>
+    `;
+  }
 
   const outcomeLabel = { easy: "facile 📈", hard: "difficile ➡️", failed: "ratée 📉" }[s.outcome] || "";
 
@@ -384,7 +396,8 @@ function bindActiveSessionEvents(container) {
       ex.isSubstituted = true;
 
       if (ex.type === "reps") {
-        const suggestion = await getSuggestionForExercise(currentSession.objectiveId, nextName);
+        const profile = await getProfile();
+        const suggestion = await getWeightRecommendation(currentSession.objectiveId, nextName, profile.bodyWeightKg);
         const prefillWeight = suggestion ? String(suggestion.suggestedWeight) : "";
         ex.suggestion = suggestion;
         ex.sets = ex.sets.map((s) => ({ ...s, weight: prefillWeight, status: null }));

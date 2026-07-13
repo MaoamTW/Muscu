@@ -5,12 +5,18 @@
 
 html, body {
   height: 100%;
+  /* Couleur de secours : sur iOS Safari, la zone de rebond ("rubber-band")
+     au-delà du haut/bas de la page affiche cette couleur d'arrière-plan
+     unie si le dégradé n'y est pas appliqué — sans ça, on obtient un flash
+     blanc au scroll. */
+  background-color: var(--bg-start);
 }
 
 body {
   margin: 0;
   background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-mid) 55%, var(--bg-end) 100%);
-  background-attachment: fixed;
+  /* Pas de "background-attachment: fixed" : mal supporté par iOS Safari,
+     c'est la cause du fond blanc qui apparaît pendant le scroll. */
   color: var(--text-primary);
   font-family: var(--font-system);
   font-size: var(--fs-body);
@@ -133,6 +139,50 @@ ul {
 .view > *:nth-child(4) { animation-delay: 120ms; }
 .view > *:nth-child(5) { animation-delay: 160ms; }
 .view > *:nth-child(n+6) { animation-delay: 200ms; }
+
+/* ==================== Accents de couleur par section ====================
+   Toutes les pages partagent la même base en verre, mais chaque grande
+   section a une teinte d'accent légèrement différente (jauge, sous-titres,
+   liens) pour mieux les distinguer d'un coup d'œil — sans casser l'identité
+   visuelle globale (dégradé de marque, cartes, boutons restent identiques).
+   Regroupement : Accueil = violet-magenta (marque) · Programme/Exercices =
+   bleu (planification) · Séance = magenta (action) · Historique/Stats/
+   Records = turquoise (analyse) · Profil = ambre (personnel). */
+:root {
+  --section-accent: var(--accent);
+}
+body[data-route="home"],
+body[data-route="onboarding"] {
+  --section-accent: var(--accent);
+}
+body[data-route="program"],
+body[data-route="exercises"] {
+  --section-accent: #38BDF8;
+}
+body[data-route="session"] {
+  --section-accent: var(--accent-strong);
+}
+body[data-route="history"],
+body[data-route="history-detail"],
+body[data-route="stats"],
+body[data-route="records"] {
+  --section-accent: #2DD4BF;
+}
+body[data-route="profile"] {
+  --section-accent: #FBBF24;
+}
+
+.page-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  margin-bottom: 1px;
+  background: var(--section-accent);
+  transition: background var(--dur-base) var(--ease-standard);
+}
 
 /* Scrollbar discrète */
 ::-webkit-scrollbar {

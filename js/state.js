@@ -24,9 +24,14 @@ export async function getProfile() {
       unit: "kg", // "kg" | "lb"
       objective: null, // ex: "hypertrophie", "force", "push-pull-legs"...
       objectiveLabel: null,
+      bodyWeightKg: null, // utilisé pour recommander une charge de départ (voir progressionEngine.js)
       constraints: { daysPerWeek: null, equipment: null },
       createdAt: new Date().toISOString(),
     };
+    await dbPut("profile", profile);
+  } else if (profile.bodyWeightKg === undefined) {
+    // Migration douce : profil créé avant l'ajout du poids corporel.
+    profile.bodyWeightKg = null;
     await dbPut("profile", profile);
   }
   profileCache = profile;

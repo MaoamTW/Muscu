@@ -4,15 +4,31 @@ import { navigateTo } from "../router.js";
 import { showToast } from "../components/toast.js";
 import { generateProgram } from "../engine/programGenerator.js";
 
+function weightOptions(selectedWeight) {
+  const options = [];
+  for (let w = 40; w <= 150; w += 5) {
+    options.push(`<option value="${w}" ${w === selectedWeight ? "selected" : ""}>${w} kg</option>`);
+  }
+  return options.join("");
+}
+
 export async function render(container) {
   const profile = await getProfile();
   let selected = profile.objective;
+  const defaultWeight = profile.bodyWeightKg || 70;
 
   container.innerHTML = `
     <div class="onboarding-intro">
       <div class="brand-mark"></div>
       <h1>Choisis ton objectif</h1>
-      <p>Un programme complet est généré automatiquement selon ton choix.</p>
+      <p>Un programme complet est généré automatiquement selon ton choix, avec des charges de départ adaptées à ton poids.</p>
+    </div>
+
+    <div class="field">
+      <label for="body-weight">Ton poids</label>
+      <select id="body-weight">
+        ${weightOptions(defaultWeight)}
+      </select>
     </div>
 
     ${OBJECTIVE_GROUPS.map(
@@ -54,7 +70,8 @@ export async function render(container) {
 
   container.querySelector("#confirm-objective").addEventListener("click", async () => {
     const objective = findObjectiveById(selected);
-    await updateProfile({ objective: selected, objectiveLabel: objective?.label ?? selected });
+    const bodyWeightKg = Number(container.querySelector("#body-weight").value);
+    await updateProfile({ objective: selected, objectiveLabel: objective?.label ?? selected, bodyWeightKg });
     await generateProgram(selected);
     showToast(`Objectif "${objective?.label}" enregistré — programme généré`);
     navigateTo("program");

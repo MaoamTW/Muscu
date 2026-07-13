@@ -8,6 +8,10 @@ export async function render(container) {
   const profile = await getProfile();
   const initial = (profile.firstName || "?").charAt(0).toUpperCase();
 
+  const weightOptionsHtml = Array.from({ length: (150 - 40) / 5 + 1 }, (_, i) => 40 + i * 5)
+    .map((w) => `<option value="${w}" ${w === profile.bodyWeightKg ? "selected" : ""}>${w} kg</option>`)
+    .join("");
+
   container.innerHTML = `
     <div class="profile-avatar">${initial}</div>
 
@@ -15,6 +19,13 @@ export async function render(container) {
       <div class="field">
         <label for="first-name">Prénom</label>
         <input type="text" id="first-name" value="${profile.firstName || ""}" placeholder="Ton prénom" />
+      </div>
+
+      <div class="field">
+        <label for="body-weight">Ton poids</label>
+        <select id="body-weight">
+          ${weightOptionsHtml}
+        </select>
       </div>
 
       <div class="field">
@@ -68,7 +79,8 @@ export async function render(container) {
   container.querySelector("#save-profile").addEventListener("click", async () => {
     const firstName = container.querySelector("#first-name").value.trim();
     const unit = container.querySelector(".is-active")?.dataset.unit || "kg";
-    await updateProfile({ firstName, unit });
+    const bodyWeightKg = Number(container.querySelector("#body-weight").value);
+    await updateProfile({ firstName, unit, bodyWeightKg });
     showToast("Profil enregistré");
     render(container);
   });

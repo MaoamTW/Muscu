@@ -13,6 +13,7 @@
  * règles qui lit et écrit uniquement dans IndexedDB (store `suggestions`).
  */
 import { dbGet, dbPut } from "../db.js";
+import { estimateStartingWeight } from "../data/exerciseWeightRatios.js";
 
 const INCREASE_RATIO = 1.05; // +5%
 const DECREASE_RATIO = 0.9; // -10%
@@ -101,4 +102,22 @@ export async function getSuggestionForExercise(objectiveId, exerciseName) {
   if (!objectiveId || !exerciseName) return null;
   const result = await dbGet("suggestions", suggestionId(objectiveId, exerciseName));
   return result || null;
+}
+
+/**
+ * Recommandation de charge à afficher avant un exercice :
+ *  1. s'il existe déjà une suggestion issue d'une séance précédente sur cet
+ *     exercice, elle est prioritaire (source: "history") ;
+ *  2. sinon, si le poids du corps est renseigné, une charge de départ est
+ *     estimée à partir du poids du corps et de l'objectif (source: "initial") ;
+ *  3. sinon, aucune recommandation n'est possible (retourne null).
+ */
+export async function getWeightRecommendation(objectiveId, exerciseName, bodyWeightKg) {
+  const history = await getSuggestionForExercise(objectiveId, exerciseName);
+  if (history) return { ...history, source: "history" };
+
+  const initialWeight = estimateStartingWeight(exerciseName, bodyWeightKg, objectiveId);
+  if (initialWeight == null) return null;
+
+  return { suggestedWeight: initialWeight, source: "initial" };
 }

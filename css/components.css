@@ -77,7 +77,7 @@
 .tab-item:active { transform: scale(0.92); }
 
 .tab-item.is-active {
-  color: var(--text-primary);
+  color: var(--section-accent);
 }
 
 .tab-label {
@@ -181,8 +181,10 @@
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--text-tertiary);
+  color: var(--section-accent);
+  opacity: 0.85;
   margin-bottom: var(--sp-4);
+  transition: color var(--dur-base) var(--ease-standard);
 }
 
 /* ==================== Boutons ==================== */
@@ -225,9 +227,10 @@
 
 .btn-ghost {
   background: transparent;
-  color: var(--accent);
+  color: var(--section-accent);
   padding: 10px 12px;
   width: auto;
+  transition: color var(--dur-base) var(--ease-standard);
 }
 
 .btn-danger {

@@ -7,7 +7,7 @@
  * Incrémenter CACHE_NAME force le renouvellement du cache lors d'un déploiement.
  */
 
-const CACHE_NAME = "forge-cache-v9";
+const CACHE_NAME = "forge-cache-v11";
 
 const APP_SHELL_FILES = [
   "./",
@@ -27,6 +27,7 @@ const APP_SHELL_FILES = [
   "./js/state.js",
   "./js/data/objectives.js",
   "./js/data/programTemplates.js",
+  "./js/data/exerciseWeightRatios.js",
   "./js/data/equipment.js",
   "./js/components/ring.js",
   "./js/components/toast.js",

@@ -59,7 +59,8 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 │   ├── /data
 │   │   ├── objectives.js       → liste des 16 objectifs proposés à l'onboarding
 │   │   ├── programTemplates.js → règles "objectif -> programme" (16 programmes complets)
-│   │   └── equipment.js         → équipement par exercice + alternatives (substitution)
+│   │   ├── equipment.js         → équipement par exercice + alternatives (substitution)
+│   │   └── exerciseWeightRatios.js → estimation de charge de départ (poids corporel × objectif)
 │   │
 │   ├── /engine
 │   │   ├── programGenerator.js   → ✅ génère/sauvegarde le programme selon l'objectif
@@ -103,7 +104,11 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
   le moteur de règles local (`progressionEngine.js`) analyse la difficulté
   de chaque série et suggère une charge pour la prochaine fois (+5% si
   facile, charge conservée si difficile, -10% si ratée), affichée en
-  bandeau au lancement de la séance suivante.
+  bandeau au lancement de la séance suivante. Pour la toute première fois
+  qu'un exercice est proposé (aucun historique), une **charge de départ
+  est estimée à partir du poids du corps et de l'objectif** renseignés
+  dans le profil (`exerciseWeightRatios.js`), plutôt que de laisser le
+  champ vide.
 - Consultation de l'historique et du détail d'une séance passée.
 - **Statistiques complètes**, recalculées automatiquement à partir des
   séances enregistrées : nombre de séances, minutes d'entraînement, volume
