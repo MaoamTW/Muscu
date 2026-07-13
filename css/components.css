@@ -53,7 +53,7 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: var(--sp-3) var(--sp-2);
+  padding: 8px var(--sp-2);
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -61,12 +61,16 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-elevated);
   z-index: 30;
-  transition: transform var(--dur-base) var(--ease-standard);
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease;
 }
 /* Masquée automatiquement quand on défilie vers le bas (voir app.js),
-   pour laisser plus de place au contenu ; reste centrée horizontalement. */
+   pour laisser plus de place au contenu ; reste centrée horizontalement.
+   Fondu + glissement doux (plutôt qu'un déplacement sec) pour un rendu
+   plus fluide. */
 .tabbar.is-hidden {
   transform: translateX(-50%) translateY(160%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .tab-item {
@@ -75,7 +79,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: var(--sp-1) 0;
+  padding: 2px 0;
   color: var(--text-tertiary);
   transition: color var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
 }
@@ -106,12 +110,15 @@
 
 /* Bouton central "Séance" mis en avant */
 .tab-item--cta {
-  position: relative;
-  top: -16px;
+  /* Reste un élément flex normal (flex:1, comme les autres onglets) pour un
+     centrage garanti et un espacement identique de chaque côté. L'icône
+     "flotte" au-dessus de la barre grâce à une marge négative sur elle-même
+     (voir .tab-icon--cta), sans gonfler la hauteur du conteneur. */
 }
 .tab-icon--cta {
   width: 54px;
   height: 54px;
+  margin-top: -26px;
   border-radius: var(--radius-pill);
   background: var(--gradient-forge);
   box-shadow: var(--shadow-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.4);
