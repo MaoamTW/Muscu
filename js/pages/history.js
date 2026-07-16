@@ -23,6 +23,9 @@ export async function render(container) {
   }
 
   container.innerHTML = `
+    <div class="section" style="margin-top:0;">
+      <a class="btn-ghost" href="#/calendar">📅 Voir le calendrier des séances</a>
+    </div>
     <ul>
       ${sessions
         .map(

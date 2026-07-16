@@ -5,12 +5,15 @@ import { getWeightRecommendation, analyzeSessionAndUpdateSuggestions } from "../
 import { getEquipmentInfo, EQUIPMENT_LABELS } from "../data/equipment.js";
 import { pickReplacement } from "../engine/substitutionEngine.js";
 import { adaptDayToDuration, estimateDayDuration, DURATION_OPTIONS, HOLD_REST_SECONDS } from "../engine/durationAdapter.js";
+import { generateWarmup } from "../engine/warmupGenerator.js";
 import { showToast } from "../components/toast.js";
+import { playRestEndSound } from "../components/sound.js";
 import { navigateTo } from "../router.js";
 
 let timerInterval = null;
 let elapsedSeconds = 0;
 let currentSession = null; // { id, objectiveId, objectiveLabel, dayName, startedAt, exercises: [...] }
+let currentProfileRef = null; // référence légère au profil, pour revenir au choix du jour depuis le mode échauffement
 
 let restTimerInterval = null;
 let restTimerRemaining = 0;
@@ -144,6 +147,7 @@ function getRecommendedDayIndex(program, allSessions) {
 }
 
 async function renderDayPicker(container, profile, program) {
+  currentProfileRef = profile;
   const allSessions = await dbGetAll("sessions");
   const recommendedIndex = getRecommendedDayIndex(program, allSessions);
   const hasRotation = program.days.length > 1;
@@ -157,6 +161,16 @@ async function renderDayPicker(container, profile, program) {
       <span class="page-eyebrow">Objectif actuel</span>
       <div class="card-title">${program.objectiveLabel}</div>
       <div class="card-sub">${program.frequencyLabel}</div>
+    </div>
+
+    <div class="section">
+      <button class="card day-picker-card" id="start-warmup-mode" style="border-color: rgba(255,255,255,0.18);">
+        <div>
+          <div class="card-title">🔥 Mode échauffement</div>
+          <div class="day-picker-sub">10 min, indépendant de la séance — à faire quand tu veux</div>
+        </div>
+        <span class="icon icon-chevron"></span>
+      </button>
     </div>
 
     <div class="section">
@@ -181,6 +195,10 @@ async function renderDayPicker(container, profile, program) {
         .join("")}
     </div>
   `;
+
+  container.querySelector("#start-warmup-mode").addEventListener("click", () => {
+    renderWarmupIntro(container, program, orderedDays[0].day);
+  });
 
   container.querySelectorAll("[data-start-day]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -237,6 +255,144 @@ function renderDurationPicker(container, profile, program, day) {
   });
 }
 
+let warmupInterval = null;
+let warmupBlockIndex = 0;
+let warmupRemaining = 0;
+
+/** Arrête un échauffement en cours (ex: si on quitte l'onglet Séance en plein milieu). */
+export function cancelActiveWarmup() {
+  clearInterval(warmupInterval);
+  warmupInterval = null;
+}
+
+/**
+ * Mode échauffement — indépendant du démarrage d'une séance. Accessible
+ * librement depuis l'écran de choix du jour, à faire quand on veut ; ne
+ * lance rien d'autre à la fin (retour à l'écran de choix du jour).
+ */
+function renderWarmupIntro(container, program, referenceDay) {
+  const warmup = generateWarmup(program, referenceDay);
+  const totalMinutes = Math.round(warmup.totalSeconds / 60);
+
+  container.innerHTML = `
+    <div class="card">
+      <span class="page-eyebrow">Mode échauffement</span>
+      <div class="card-title">Échauffement (~${totalMinutes} min)</div>
+      <div class="card-sub">Adapté à ton objectif actuel, pour préparer le corps et réduire le risque de blessure.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Au programme</div>
+      <ul>
+        ${warmup.blocks
+          .map(
+            (b) => `
+          <li class="list-row">
+            <div>
+              <div class="list-row-title">${b.name}</div>
+              <div class="list-row-sub">${Math.round(b.durationSeconds / 60) || Math.round(b.durationSeconds)} ${
+              b.durationSeconds >= 60 ? "min" : "sec"
+            }</div>
+            </div>
+          </li>
+        `
+          )
+          .join("")}
+      </ul>
+    </div>
+
+    <div class="section">
+      <button class="btn btn-primary" id="start-warmup">Commencer l'échauffement</button>
+      <button class="btn-ghost" id="cancel-warmup" style="margin-top: var(--sp-2);">← Retour</button>
+    </div>
+  `;
+
+  container.querySelector("#start-warmup").addEventListener("click", () => {
+    runWarmupBlock(container, program, warmup.blocks, 0);
+  });
+
+  container.querySelector("#cancel-warmup").addEventListener("click", () => {
+    renderDayPicker(container, currentProfileRef, program);
+  });
+}
+
+/** Exécute un bloc d'échauffement avec un décompte automatique, puis enchaîne sur le suivant. */
+function runWarmupBlock(container, program, blocks, index) {
+  clearInterval(warmupInterval);
+
+  if (index >= blocks.length) {
+    renderWarmupComplete(container, program);
+    return;
+  }
+
+  warmupBlockIndex = index;
+  warmupRemaining = blocks[index].durationSeconds;
+  const block = blocks[index];
+
+  const renderBlock = () => {
+    const percent = Math.max(0, Math.round((warmupRemaining / block.durationSeconds) * 100));
+    container.innerHTML = `
+      <div class="card">
+        <span class="page-eyebrow">Échauffement — étape ${index + 1} / ${blocks.length}</span>
+        <div class="card-title">${block.name}</div>
+      </div>
+
+      <div class="session-timer">
+        <div class="timer-value">${formatTime(warmupRemaining)}</div>
+        <div class="timer-label">Temps restant sur cette étape</div>
+      </div>
+
+      <div class="card">
+        <div class="rest-timer-track"><div class="rest-timer-fill" style="width:${percent}%"></div></div>
+      </div>
+
+      <div class="section">
+        <button class="btn btn-secondary" id="next-warmup-block">Étape suivante</button>
+        <button class="btn-ghost" id="stop-warmup" style="margin-top: var(--sp-2);">Arrêter l'échauffement</button>
+      </div>
+    `;
+
+    container.querySelector("#next-warmup-block").addEventListener("click", () => {
+      runWarmupBlock(container, program, blocks, index + 1);
+    });
+    container.querySelector("#stop-warmup").addEventListener("click", () => {
+      clearInterval(warmupInterval);
+      renderDayPicker(container, currentProfileRef, program);
+    });
+  };
+
+  renderBlock();
+
+  warmupInterval = setInterval(() => {
+    warmupRemaining -= 1;
+    if (warmupRemaining <= 0) {
+      clearInterval(warmupInterval);
+      playRestEndSound();
+      runWarmupBlock(container, program, blocks, index + 1);
+      return;
+    }
+    const el = container.querySelector(".timer-value");
+    const fill = container.querySelector(".rest-timer-fill");
+    if (el) el.textContent = formatTime(warmupRemaining);
+    if (fill) fill.style.width = `${Math.round((warmupRemaining / block.durationSeconds) * 100)}%`;
+  }, 1000);
+}
+
+/** Écran de fin d'échauffement : ne lance rien d'autre, juste un retour au choix de séance. */
+function renderWarmupComplete(container, program) {
+  container.innerHTML = `
+    <div class="empty-state" style="margin-top: var(--sp-6);">
+      <div class="empty-icon"><span class="icon icon-check"></span></div>
+      <h3>Échauffement terminé 💪</h3>
+      <p>Le corps est prêt. Tu peux maintenant démarrer ta séance quand tu veux.</p>
+      <button class="btn btn-primary" id="warmup-done">Choisir ma séance</button>
+    </div>
+  `;
+  container.querySelector("#warmup-done").addEventListener("click", () => {
+    renderDayPicker(container, currentProfileRef, program);
+  });
+}
+
 /** Adapte le jour choisi à la durée sélectionnée, construit la séance et la démarre. */
 async function startSession(container, profile, program, day, durationOption) {
   const adapted = adaptDayToDuration(day, durationOption.minutes);
@@ -289,6 +445,7 @@ function startRestTimer(seconds) {
       restTimerInterval = null;
       hideRestTimer();
       showToast("Repos terminé — c'est reparti 💪");
+      playRestEndSound();
       if (navigator.vibrate) {
         try {
           navigator.vibrate([200, 100, 200]);

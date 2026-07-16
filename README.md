@@ -54,6 +54,7 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 │   ├── /components
 │   │   ├── ring.js             → anneau de progression SVG (élément signature)
 │   │   ├── toast.js             → notifications discrètes
+│   │   ├── sound.js               → bip sonore de fin de repos (Web Audio API)
 │   │   └── barChart.js           → mini graphique en barres SVG (statistiques)
 │   │
 │   ├── /data
@@ -68,11 +69,12 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
 │   │   ├── statsEngine.js         → ✅ calcule toutes les statistiques à la volée
 │   │   ├── substitutionEngine.js   → ✅ choisit un exercice de remplacement
 │   │   ├── durationAdapter.js       → ✅ adapte une séance à la durée choisie
+│   │   ├── warmupGenerator.js        → ✅ génère l'échauffement (~15 min) adapté
 │   │   └── recordsEngine.js       → 🚧 non utilisé (les records sont désormais calculés par statsEngine.js)
 │   │
 │   └── /pages                  → une page = une fonction render(container)
 │       ├── onboarding.js, home.js, program.js, session.js,
-│       ├── history.js, historyDetail.js, exercises.js,
+│       ├── history.js, historyDetail.js, calendar.js, exercises.js,
 │       └── stats.js, records.js, profile.js
 │
 ├── /data
@@ -93,6 +95,13 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
   possibilité de régénérer et de changer d'objectif à tout moment.
 - Bibliothèque d'exercices : lecture des exercices prédéfinis + ajout
   d'exercices personnalisés + recherche.
+- **Mode échauffement (~10 min)**, indépendant du démarrage d'une séance
+  — accessible librement depuis l'écran de choix du jour, à faire quand on
+  veut. Adapté à l'objectif et aux muscles sollicités par le jour
+  recommandé (cardio léger, mobilité articulaire, étirements dynamiques,
+  séries d'activation à charge légère), avec décompte automatique étape
+  par étape. Ne lance rien d'autre à la fin : simple retour au choix de la
+  séance.
 - Démarrage d'une séance **directement à partir du programme généré** :
   si le programme propose plusieurs types de séance, celui recommandé
   aujourd'hui (le suivant dans la rotation depuis la dernière séance faite)
@@ -105,7 +114,9 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
   répétitions cibles, saisie du poids utilisé et validation série par
   série (facile / difficile / ratée) — **un chrono de repos démarre
   automatiquement** à chaque série ou maintien validé, affiché dans une
-  barre persistante avec possibilité de le passer. Chaque exercice avec
+  barre persistante avec possibilité de le passer, et accompagné d'un
+  **bip sonore** à la fin (en plus de la notification visuelle — la
+  vibration n'étant pas supportée par Safari iOS). Chaque exercice avec
   charge ou cardio affiche une illustration de l'équipement nécessaire,
   deux liens externes pour voir une photo ou une vidéo de la machine, et
   un bouton **"Machine indisponible"** qui propose un exercice de
@@ -120,7 +131,9 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
   est estimée à partir du poids du corps et de l'objectif** renseignés
   dans le profil (`exerciseWeightRatios.js`), plutôt que de laisser le
   champ vide.
-- Consultation de l'historique et du détail d'une séance passée.
+- Consultation de l'historique et du détail d'une séance passée, ainsi
+  qu'un **calendrier des séances** (vue mensuelle façon "contribution
+  graph") pour visualiser sa régularité d'un coup d'œil.
 - **Statistiques complètes**, recalculées automatiquement à partir des
   séances enregistrées : nombre de séances, minutes d'entraînement, volume
   total, série de jours consécutifs (streak), progression hebdomadaire et

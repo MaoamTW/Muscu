@@ -7,6 +7,7 @@ import * as homePage from "./pages/home.js";
 import * as programPage from "./pages/program.js";
 import * as sessionPage from "./pages/session.js";
 import * as historyPage from "./pages/history.js";
+import * as calendarPage from "./pages/calendar.js";
 import * as historyDetailPage from "./pages/historyDetail.js";
 import * as exercisesPage from "./pages/exercises.js";
 import * as statsPage from "./pages/stats.js";
@@ -20,6 +21,7 @@ const ROUTE_META = {
   session: { eyebrow: "En cours", title: "Séance" },
   history: { eyebrow: "Suivi", title: "Historique", back: "home" },
   "history-detail": { eyebrow: "Historique", title: "Détail de la séance", back: "history" },
+  calendar: { eyebrow: "Suivi", title: "Calendrier", back: "history" },
   exercises: { eyebrow: "Bibliothèque", title: "Exercices", back: "program" },
   stats: { eyebrow: "Suivi", title: "Statistiques" },
   records: { eyebrow: "Suivi", title: "Records personnels", back: "stats" },
@@ -116,6 +118,7 @@ async function bootstrap() {
   registerRoute("exercises", exercisesPage.render);
   registerRoute("stats", statsPage.render);
   registerRoute("records", recordsPage.render);
+  registerRoute("calendar", calendarPage.render);
   registerRoute("profile", profilePage.render);
 
   // "#/history/xyz" doit utiliser la vue "history-detail" tout en gardant l'URL lisible.
@@ -132,6 +135,7 @@ async function bootstrap() {
   });
 
   setOnNavigate((name) => {
+    sessionPage.cancelActiveWarmup();
     renderHeader(name || "home");
     updateActiveTab(name || "home");
   });

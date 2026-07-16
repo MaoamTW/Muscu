@@ -404,3 +404,47 @@
   margin: 0 auto var(--sp-4);
   box-shadow: 0 10px 28px rgba(100, 181, 246, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4);
 }
+
+/* ==================== Calendrier des séances ==================== */
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: var(--sp-4);
+  margin-bottom: var(--sp-2);
+}
+.calendar-weekdays span {
+  text-align: center;
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.calendar-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: var(--fs-small);
+}
+.calendar-cell--empty { visibility: hidden; }
+.calendar-cell.is-today .calendar-cell-number {
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+.calendar-cell.is-today { box-shadow: inset 0 0 0 1px var(--glass-border); }
+.calendar-cell.has-session {
+  background: var(--section-accent, var(--accent));
+  color: #14060F;
+  font-weight: var(--fw-semibold);
+}
+.calendar-cell.has-session:active { transform: scale(0.92); }
+.calendar-dot { display: none; } /* le fond coloré de la case suffit à signaler une séance */
