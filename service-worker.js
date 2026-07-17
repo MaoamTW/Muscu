@@ -7,7 +7,7 @@
  * Incrémenter CACHE_NAME force le renouvellement du cache lors d'un déploiement.
  */
 
-const CACHE_NAME = "forge-cache-v17";
+const CACHE_NAME = "forge-cache-v18";
 
 const APP_SHELL_FILES = [
   "./",

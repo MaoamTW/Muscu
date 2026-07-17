@@ -95,12 +95,13 @@ n'est nécessaire, ce sont uniquement des fichiers statiques.
   possibilité de régénérer et de changer d'objectif à tout moment.
 - Bibliothèque d'exercices : lecture des exercices prédéfinis + ajout
   d'exercices personnalisés + recherche.
-- **Mode échauffement (~10 min)**, indépendant du démarrage d'une séance
+- **Mode échauffement (15 min)**, indépendant du démarrage d'une séance
   — accessible librement depuis l'écran de choix du jour, à faire quand on
-  veut. Adapté à l'objectif et aux muscles sollicités par le jour
-  recommandé (cardio léger, mobilité articulaire, étirements dynamiques,
-  séries d'activation à charge légère), avec décompte automatique étape
-  par étape. Ne lance rien d'autre à la fin : simple retour au choix de la
+  veut. Composé de seulement 2 blocs longs (10 min de cardio léger, puis
+  5 min de mobilité/étirements dynamiques + activation légère, adaptés à
+  la zone sollicitée par le jour recommandé), plutôt qu'une multitude de
+  petites étapes d'une minute. Décompte automatique qui enchaîne les
+  blocs ; ne lance rien d'autre à la fin, simple retour au choix de la
   séance.
 - Démarrage d'une séance **directement à partir du programme généré** :
   si le programme propose plusieurs types de séance, celui recommandé

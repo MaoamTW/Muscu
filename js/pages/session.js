@@ -167,7 +167,7 @@ async function renderDayPicker(container, profile, program) {
       <button class="card day-picker-card" id="start-warmup-mode" style="border-color: rgba(255,255,255,0.18);">
         <div>
           <div class="card-title">🔥 Mode échauffement</div>
-          <div class="day-picker-sub">10 min, indépendant de la séance — à faire quand tu veux</div>
+          <div class="day-picker-sub">15 min, indépendant de la séance — à faire quand tu veux</div>
         </div>
         <span class="icon icon-chevron"></span>
       </button>
